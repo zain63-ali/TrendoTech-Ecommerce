@@ -1,0 +1,198 @@
+<!-- Hero Section -->
+<section class="hero-section">
+    <div id="carouselHero" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselHero" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#carouselHero" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#carouselHero" data-bs-slide-to="2"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="/images/slider/slider0.jpg" class="d-block w-100" alt="Men's Fashion Collection">
+                <div class="carousel-caption">
+                    <h2>Men's Collection</h2>
+                    <p>Discover our latest styles for men.</p>
+                    <a href="/products?category=men-clothing" class="btn btn-danger">Shop Now</a>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="/images/slider/slider1.jpg" class="d-block w-100" alt="Women's Fashion Collection">
+                <div class="carousel-caption">
+                    <h2>Women's Collection</h2>
+                    <p>Elegant and trendy styles for women.</p>
+                    <a href="/products?category=women-clothing" class="btn btn-danger">Shop Now</a>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="/images/slider/slider2.jpg" class="d-block w-100" alt="Electronics Collection">
+                <div class="carousel-caption">
+                    <h2>Electronics</h2>
+                    <p>Latest gadgets and electronics.</p>
+                    <a href="/products?category=electronics" class="btn btn-danger">Shop Now</a>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselHero" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselHero" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</section>
+
+{{#if user}}
+<div class="container mt-4">
+    {{#if successMessage}}
+    <div class="alert alert-success">
+        {{successMessage}}
+    </div>
+    {{/if}}
+    
+    {{#if (eq user.role 'admin')}}
+    <div class="alert alert-primary d-flex align-items-center">
+        <i class="fas fa-user-shield me-3 fs-4"></i>
+        <div>
+            <h5 class="alert-heading">Welcome, Admin!</h5>
+            <p class="mb-0">You have full access to the e-commerce platform. Manage users, products, and monitor site activity from your <a href="/admin/dashboard" class="alert-link">admin dashboard</a>.</p>
+        </div>
+    </div>
+    {{else if (eq user.role 'seller')}}
+    <div class="alert alert-success d-flex align-items-center">
+        <i class="fas fa-store me-3 fs-4"></i>
+        <div>
+            <h5 class="alert-heading">Welcome, Seller!</h5>
+            <p class="mb-0">Ready to grow your business? Add and manage your products from your <a href="/seller/dashboard" class="alert-link">seller dashboard</a>.</p>
+        </div>
+    </div>
+    {{else}}
+    <div class="alert alert-info d-flex align-items-center">
+        <i class="fas fa-user me-3 fs-4"></i>
+        <div>
+            <h5 class="alert-heading">Welcome back, {{user.name}}!</h5>
+            <p class="mb-0">Check out our latest products and special offers below. Visit your <a href="/users/profile" class="alert-link">profile</a> to manage your account.</p>
+        </div>
+    </div>
+    {{/if}}
+</div>
+{{/if}}
+
+<div class="container">
+    <!-- Featured Products Section -->
+    <section class="my-5">
+        <h2 class="section-heading">Featured Products</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {{#each featuredProducts}}
+            <div class="col">
+                {{> product-card product=this}}
+            </div>
+            {{else}}
+            <div class="col-12">
+                <div class="alert alert-info">No featured products available at the moment.</div>
+            </div>
+            {{/each}}
+        </div>
+        <div class="text-center mt-4">
+            <a href="/products" class="btn btn-outline-secondary">View All Products</a>
+        </div>
+    </section>
+
+    <!-- Category Sections -->
+    <section class="my-5">
+        <h2 class="section-heading">Men's Clothing</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {{#each menClothing}}
+            <div class="col">
+                {{> product-card product=this}}
+            </div>
+            {{else}}
+            <div class="col-12">
+                <div class="alert alert-info">No men's clothing products available at the moment.</div>
+            </div>
+            {{/each}}
+        </div>
+        <div class="text-center mt-4">
+            <a href="/products?category=men-clothing" class="btn btn-outline-secondary">View All Men's Clothing</a>
+        </div>
+    </section>
+
+    <section class="my-5">
+        <h2 class="section-heading">Women's Clothing</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {{#each womenClothing}}
+            <div class="col">
+                {{> product-card product=this}}
+            </div>
+            {{else}}
+            <div class="col-12">
+                <div class="alert alert-info">No women's clothing products available at the moment.</div>
+            </div>
+            {{/each}}
+        </div>
+        <div class="text-center mt-4">
+            <a href="/products?category=women-clothing" class="btn btn-outline-secondary">View All Women's Clothing</a>
+        </div>
+    </section>
+
+    <section class="my-5">
+        <h2 class="section-heading">Electronics</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {{#each electronics}}
+            <div class="col">
+                {{> product-card product=this}}
+            </div>
+            {{else}}
+            <div class="col-12">
+                <div class="alert alert-info">No electronics products available at the moment.</div>
+            </div>
+            {{/each}}
+        </div>
+        <div class="text-center mt-4">
+            <a href="/products?category=electronics" class="btn btn-outline-secondary">View All Electronics</a>
+        </div>
+    </section>
+
+    <!-- Services/Benefits Section -->
+    <section class="my-5 py-4">
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="fas fa-truck fa-3x mb-3 text-primary"></i>
+                        <h4 class="fs-5 fw-semibold">Free Shipping</h4>
+                        <p class="text-muted small">On all orders over PKR 500</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="fas fa-undo fa-3x mb-3 text-primary"></i>
+                        <h4 class="fs-5 fw-semibold">Easy Returns</h4>
+                        <p class="text-muted small">30 days return policy</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="fas fa-lock fa-3x mb-3 text-primary"></i>
+                        <h4 class="fs-5 fw-semibold">Secure Payment</h4>
+                        <p class="text-muted small">100% secure checkout</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <i class="fas fa-headset fa-3x mb-3 text-primary"></i>
+                        <h4 class="fs-5 fw-semibold">24/7 Support</h4>
+                        <p class="text-muted small">Dedicated customer support</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div> 

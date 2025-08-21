@@ -1,0 +1,152 @@
+<div class="container my-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Admin Menu</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="/admin/dashboard" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <a href="/admin/users" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users me-2"></i> Manage Users
+                    </a>
+                    <a href="/admin/products" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-box me-2"></i> Manage Products
+                    </a>
+                    <a href="/admin/orders" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shopping-cart me-2"></i> Manage Orders
+                    </a>
+                    <a href="/users/profile" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user me-2"></i> My Profile
+                    </a>
+                    <a href="/users/logout" class="list-group-item list-group-item-action text-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Manage Products</h2>
+                <a href="/admin/products/add" class="btn btn-success">
+                    <i class="fas fa-plus-circle me-2"></i> Add New Product
+                </a>
+            </div>
+            
+            {{#if formSuccess}}
+            <div class="alert alert-success mb-4">
+                {{formSuccess}}
+            </div>
+            {{/if}}
+            
+            {{#if formError}}
+            <div class="alert alert-danger mb-4">
+                {{formError}}
+            </div>
+            {{/if}}
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Product List</h5>
+                    <div class="btn-group">
+                        <a href="/admin/products" class="btn btn-sm btn-outline-light {{#unless filter}}active{{/unless}}">All</a>
+                        <a href="/admin/products?filter=men-clothing" class="btn btn-sm btn-outline-light {{#if (eq filter 'men-clothing')}}active{{/if}}">Men's</a>
+                        <a href="/admin/products?filter=women-clothing" class="btn btn-sm btn-outline-light {{#if (eq filter 'women-clothing')}}active{{/if}}">Women's</a>
+                        <a href="/admin/products?filter=electronics" class="btn btn-sm btn-outline-light {{#if (eq filter 'electronics')}}active{{/if}}">Electronics</a>
+                        <a href="/admin/products?filter=accessories" class="btn btn-sm btn-outline-light {{#if (eq filter 'accessories')}}active{{/if}}">Accessories</a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Seller</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each products}}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{this.imageUrl}}" alt="{{this.name}}" class="img-thumbnail me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                                            <div>
+                                                <a href="/products/{{this._id}}" class="text-decoration-none">{{this.name}}</a>
+                                                {{#if this.featured}}<span class="badge bg-warning ms-1">Featured</span>{{/if}}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{categoryName this.category}}</td>
+                                    <td>Rs. {{this.price}}</td>
+                                    <td>
+                                        {{#if this.seller}}
+                                            {{this.seller.name}}
+                                        {{else}}
+                                            <span class="text-muted">N/A</span>
+                                        {{/if}}
+                                    </td>
+                                    <td>
+                                        <span class="badge {{#if this.inStock}}bg-success{{else}}bg-danger{{/if}}">
+                                            {{#if this.inStock}}In Stock{{else}}Out of Stock{{/if}}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group">
+                                            <form action="/admin/products/featured/{{this._id}}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm {{#if this.featured}}btn-warning{{else}}btn-outline-warning{{/if}} me-1" title="Toggle Featured">
+                                                    <i class="fas fa-star"></i>
+                                                </button>
+                                            </form>
+                                            <a href="/admin/products/edit/{{this._id}}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{this._id}}" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Delete Modal -->
+                                        <div class="modal fade" id="deleteModal{{this._id}}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Confirm Delete</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete <strong>{{this.name}}</strong>?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <form action="/admin/products/delete/{{this._id}}" method="POST">
+                                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {{else}}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">No products found</td>
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,408 @@
+/* Theme Colors */
+:root {
+    --primary: #3d3853;
+    --secondary: #6c757d;
+    --accent: #ff5c5c;
+    --dark: #222;
+    --light: #f8f9fa;
+    --white: #fff;
+    --border-color: #eaeaea;
+}
+
+/* General Styles */
+body {
+    font-family: 'Poppins', 'Roboto', sans-serif;
+    color: #333;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #322d45;
+    border-color: #322d45;
+}
+
+.btn-danger, .bg-danger {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+
+.btn-danger:hover, .btn-danger:focus {
+    background-color: #ec4c4c !important;
+    border-color: #ec4c4c !important;
+}
+
+.bg-primary {
+    background-color: var(--primary) !important;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover {
+    color: #322d45;
+}
+
+/* Header Styles */
+.navbar .nav-link {
+    color: var(--dark);
+    margin: 0 8px;
+}
+
+.navbar .nav-link:hover {
+    color: var(--accent);
+}
+
+/* Enhanced search bar styling */
+.search-bar {
+    background-color: var(--primary);
+    transition: all 0.3s ease;
+}
+
+.search-bar form {
+    position: relative;
+}
+
+.search-bar .form-control {
+    border-radius: 4px;
+    border: none;
+    padding: 12px 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.search-bar .form-control:focus {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border: none;
+    outline: none;
+}
+
+.search-bar .btn {
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.search-bar .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Product Card Styles */
+.product-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    height: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-image {
+    height: 200px;
+    object-fit: cover;
+}
+
+.product-card .card-title {
+    font-weight: 600;
+    margin-top: 8px;
+    font-size: 1rem;
+}
+
+.product-card .badge {
+    font-weight: 500;
+    font-size: 0.7rem;
+    padding: 5px 8px;
+    border-radius: 4px;
+}
+
+.card-body {
+    padding: 1rem;
+}
+
+/* Hero Section Styles */
+.hero-section {
+    margin-top: 0;
+}
+
+.hero-section .carousel-item {
+    height: 700px;
+    padding: 50px;
+}
+
+.hero-section img {
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.7);
+}
+
+.carousel-caption {
+    bottom: 100px;
+}
+
+.carousel-caption h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section .carousel-item {
+        height: 350px;
+    }
+    
+    .carousel-caption {
+        bottom: 60px;
+    }
+    
+    .carousel-caption h2 {
+        font-size: 1.8rem;
+    }
+}
+
+/* Category buttons */
+.category-btn {
+    display: block;
+    text-align: center;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    transition: all 0.3s;
+    color: white;
+    text-decoration: none;
+    background-color: var(--primary);
+}
+
+.category-btn:hover {
+    transform: scale(1.03);
+    color: white;
+    background-color: #322d45;
+}
+
+/* Footer */
+footer {
+    background-color: var(--primary);
+}
+
+footer a:hover {
+    color: var(--accent) !important;
+    text-decoration: none;
+    opacity: 1;
+}
+
+/* Custom badges */
+.badge {
+    padding: 0.5em 0.8em;
+    font-weight: 500;
+}
+
+/* Price and action buttons in product cards */
+.product-card .btn-group {
+    opacity: 0.9;
+    transition: opacity 0.3s;
+}
+
+.product-card:hover .btn-group {
+    opacity: 1;
+}
+
+/* Product prices */
+.product-price {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+/* Page transitions */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Cart page styles */
+.quantity-input {
+    max-width: 50px;
+    text-align: center;
+}
+
+/* Toast notifications */
+.toast {
+    z-index: 1080;
+}
+
+/* Checkout button */
+#checkout-btn {
+    transition: all 0.3s;
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+#checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+    background-color: #ec4c4c;
+    border-color: #ec4c4c;
+}
+
+/* Section headings */
+.section-heading {
+    position: relative;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    display: inline-block;
+}
+
+.section-heading:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: var(--accent);
+}
+
+/* Product image link styles */
+.product-image-link {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.product-image-link::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0);
+    transition: background-color 0.3s;
+}
+
+.product-image-link:hover::after {
+    background-color: rgba(0, 0, 0, 0.1);
+} 
+
+/* Order tracking progress styles */
+.progress-track {
+    margin: 15px auto;
+    position: relative;
+    text-align: center;
+    width: 100%;
+}
+#progressbar {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    counter-reset: step;
+}
+#progressbar li {
+    list-style-type: none;
+    color: #aaa;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    width: 25%;
+    float: left;
+    position: relative;
+    font-weight: 500;
+}
+#progressbar li:before {
+    content: counter(step);
+    counter-increment: step;
+    width: 25px;
+    line-height: 25px;
+    display: block;
+    font-size: 0.8rem;
+    color: #fff;
+    background: #aaa;
+    border-radius: 50%;
+    margin: 0 auto 5px auto;
+    z-index: 2;
+}
+#progressbar li:after {
+    content: '';
+    width: 100%;
+    height: 2px;
+    background: #aaa;
+    position: absolute;
+    left: -50%;
+    top: 12px;
+    z-index: 1;
+}
+#progressbar li:first-child:after {
+    content: none;
+}
+#progressbar li.active {
+    color: #007bff;
+}
+#progressbar li.active:before {
+    background: #007bff;
+}
+#progressbar li.active:after {
+    background: #007bff;
+}
+
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.back-to-top:hover {
+    background-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    color: white;
+}
+
+.back-to-top.show {
+    display: flex;
+}
+
+/* Responsive adjustments for back to top button */
+@media (max-width: 768px) {
+    .back-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 16px;
+    }
+}

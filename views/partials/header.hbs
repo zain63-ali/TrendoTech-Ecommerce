@@ -1,0 +1,104 @@
+<!-- Top Bar -->
+<div class="bg-light py-2">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div class="d-flex gap-3">
+            <a href="/products?featured=true" class="text-decoration-none text-secondary small">Featured Products</a>
+        <!--    <a href="/wishlist" class="text-decoration-none text-secondary small">Wishlist</a> -->
+            <a href="/blogs" class="text-decoration-none text-secondary small">Blog</a>    
+            {{#if user}}
+                {{#if (eq user.role 'admin')}}
+                <a href="/admin/dashboard" class="text-decoration-none text-secondary small">Admin Dashboard</a>
+                {{/if}}
+                {{#if (eq user.role 'seller')}}
+                <a href="/seller/dashboard" class="text-decoration-none text-secondary small">Seller Dashboard</a>
+                {{/if}}
+            {{/if}}
+        </div>
+        <div class="d-flex gap-3">
+            {{#if user}}
+                <a href="/users/profile" class="text-decoration-none text-secondary small">Hello, {{user.name}}</a>
+                <a href="/users/logout" class="text-decoration-none text-secondary small">Logout</a>
+            {{else}}
+                <a href="/users/login" class="text-decoration-none text-secondary small">Login</a>
+                <a href="/users/signup" class="text-decoration-none text-secondary small">Signup</a>
+            {{/if}}
+            {{#unless (or (eq user.role 'admin') (eq user.role 'seller'))}}
+            <a href="/my-orders" class="text-decoration-none text-secondary small">My Orders</a>
+            <a href="/order-tracking" class="text-decoration-none text-secondary small">Order Tracking</a>
+            {{/unless}}
+        </div>
+    </div>
+</div>
+
+<!-- Main Header -->
+<header class="bg-white py-3">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <!-- Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <span class="bg-primary rounded-circle d-inline-block me-2" style="width: 30px; height: 30px;"></span>
+                <span class="fw-bold fs-4">TrendoTech</span>
+            </a>
+            
+            <!-- Navigation -->
+            <nav class="navbar navbar-expand-lg">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link fw-medium" href="/">Home</a>
+                        </li>
+                         <li class="nav-item">
+                            <a class="nav-link fw-medium" href="/products?category=women-clothing">Women</a>
+                            </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-medium" href="/products?category=men-clothing">Men</a>
+                            </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-medium" href="/products?category=accessories">Accessories</a>
+                        </li>
+                        <li class="nav-item position-relative">
+                            <a class="nav-link fw-medium" href="/products?category=electronics">
+                                Electronics
+                                <span class="badge bg-danger position-absolute" style="top: 0; right: -15px; font-size: 8px; padding: 3px 5px;">NEW</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <!-- Icons -->
+            {{#unless (or (eq user.role 'admin') (eq user.role 'seller'))}}
+            <div class="d-flex align-items-center gap-3">
+                <a href="/wishlist" class="position-relative me-2">
+                    <i class="fas fa-heart fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark wishlist-count">
+                        {{wishlistCount}}
+                    </span>
+                </a>
+                <a href="/cart" class="position-relative">
+                    <i class="fas fa-shopping-cart fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark cart-count">
+                        {{cartCount}}
+                    </span>
+                </a>
+                <div class="ms-3 fw-medium">
+                    Total <br>Rs{{#if cartTotal}}{{cartTotal}}{{else}}0.00{{/if}}
+                </div>
+            </div>
+            {{/unless}}
+        </div>
+    </div>
+</header>
+
+<!-- Search Bar -->
+<div class="search-bar py-4" style="background-color: #3d3853;">
+    <div class="container">
+        <form action="/products" method="GET" class="d-flex">
+            <input type="text" name="search" class="form-control me-2" placeholder="Search For Products" aria-label="Search">
+            <button class="btn btn-danger" type="submit">Search</button>
+        </form>
+    </div>
+</div> 
