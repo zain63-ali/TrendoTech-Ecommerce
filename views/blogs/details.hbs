@@ -1,8 +1,9 @@
+{{!-- Blog Post Details Page - Blog post ki tafseel --}}
 <div class="container my-5">
     <div class="row">
-        <!-- Main Content -->
+        {{!-- Main Blog Content --}}
         <div class="col-lg-8">
-            <!-- Breadcrumb -->
+            {{!-- Breadcrumb Navigation --}}
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -12,10 +13,11 @@
                 </ol>
             </nav>
 
-            <!-- Blog Post -->
+            {{!-- Blog Post Article --}}
             <article class="blog-post">
                 <h1 class="mb-3">{{blog.title}}</h1>
                 
+                {{!-- Blog meta information --}}
                 <div class="d-flex mb-4 align-items-center">
                     <span class="ms-auto text-muted">
                         <i class="fas fa-user me-1"></i> {{#if blog.author}}{{blog.author.name}}{{else}}Unknown Author{{/if}} | 
@@ -24,16 +26,19 @@
                     </span>
                 </div>
                 
+                {{!-- Blog featured image --}}
                 <img src="{{blog.imageUrl}}" alt="{{blog.title}}" class="img-fluid rounded mb-4 w-100" style="max-height: 400px; object-fit: cover;">
                 
+                {{!-- Blog content --}}
                 <div class="blog-content mb-5">
                     {{{blog.content}}}
                 </div>
                 
-                <!-- Social Share -->
+                {{!-- Social Share Card --}}
                 <div class="card mb-5">
                     <div class="card-body">
                         <h5 class="card-title">Share this post</h5>
+                        {{!-- Social media sharing buttons --}}
                         <div class="d-flex gap-2">
                             <a href="https://www.facebook.com/sharer/sharer.php?u={{encodeURIComponent currentUrl}}" target="_blank" class="btn btn-outline-primary">
                                 <i class="fab fa-facebook-f"></i>
@@ -51,7 +56,7 @@
                     </div>
                 </div>
                 
-                <!-- Related Posts -->
+                {{!-- Related Posts Section --}}
                 {{#if relatedPosts.length}}
                 <div class="related-posts">
                     <h3 class="mb-4">Related Posts</h3>
@@ -80,14 +85,15 @@
             </article>
         </div>
 
-        <!-- Sidebar -->
+        {{!-- Blog Sidebar --}}
         <div class="col-lg-4">
-            <!-- Search -->
+            {{!-- Search Card --}}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Search</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Blog search form --}}
                     <form action="/blogs" method="GET">
                         <div class="input-group">
                             <input type="text" class="form-control" name="search" placeholder="Search blogs...">
@@ -99,12 +105,13 @@
                 </div>
             </div>
 
-            <!-- Categories -->
+            {{!-- Categories Card --}}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Categories</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Category filter links --}}
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <a href="/blogs" class="text-decoration-none text-dark">All Categories</a>
@@ -120,12 +127,13 @@
                 </div>
             </div>
 
-            <!-- Recent Posts -->
+            {{!-- Recent Posts Card --}}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Recent Posts</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Recent blog posts list --}}
                     <ul class="list-group list-group-flush">
                         {{#each recentPosts}}
                         <li class="list-group-item p-2">
@@ -141,7 +149,7 @@
                 </div>
             </div>
 
-            <!-- Admin Actions -->
+            {{!-- Admin Actions Card (sirf admins ke liye) --}}
             {{#if (eq user.role 'admin')}}
             <div class="card mb-4">
                 <div class="card-header bg-dark text-white">
@@ -159,7 +167,7 @@
                 </div>
             </div>
 
-            <!-- Delete Modal -->
+            {{!-- Delete Confirmation Modal --}}
             <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -182,4 +190,4 @@
             {{/if}}
         </div>
     </div>
-</div> 
+</div>

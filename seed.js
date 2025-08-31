@@ -1,20 +1,21 @@
-const mongoose = require('mongoose');
-const Product = require('./models/Product');
+// Database seeding script - Database mein sample products add karne ke liye
+const mongoose = require('mongoose'); // MongoDB connection
+const Product = require('./models/Product'); // Product model
 
-// Connect to MongoDB
+// MongoDB se connection establish karo
 mongoose.connect('mongodb://localhost:27017/ecommerce', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+    useNewUrlParser: true, // New URL parser use karo
+    useUnifiedTopology: true // New connection management
 })
-.then(() => console.log('MongoDB Connected for seeding'))
+.then(() => console.log('MongoDB Connected for seeding')) // Success message
 .catch(err => {
-    console.log('MongoDB Connection Error:', err);
-    process.exit(1);
+    console.log('MongoDB Connection Error:', err); // Error handle karo
+    process.exit(1); // Process terminate karo
 });
 
-// Dummy products data
+// Sample products data - Database mein add karne ke liye dummy data
 const products = [
-    // Men's Clothing
+    // Men's Clothing - Mard ke kapde
     {
         name: "Classic Fit Dress Shirt",
         description: "A timeless classic fit dress shirt with a comfortable feel. Perfect for formal occasions or office wear.",
@@ -61,7 +62,7 @@ const products = [
         featured: false
     },
 
-    // Women's Clothing
+    // Women's Clothing - Aurat ke kapde
     {
         name: "Floral Print Dress",
         description: "Beautiful floral print dress perfect for spring and summer occasions.",
@@ -108,7 +109,7 @@ const products = [
         featured: false
     },
 
-    // Accessories
+    // Accessories - Accessories aur extra items
     {
         name: "Leather Wallet",
         description: "Genuine leather wallet with multiple card slots and compartments.",
@@ -146,7 +147,7 @@ const products = [
         featured: false
     },
 
-    // Electronics
+    // Electronics - Electronic devices aur gadgets
     {
         name: "Wireless Headphones",
         description: "High-quality wireless headphones with noise cancellation and long battery life.",
@@ -194,24 +195,24 @@ const products = [
     }
 ];
 
-// Seed the database
+// Database seeding function - Products ko database mein add karta hai
 const seedDB = async () => {
     try {
-        // Delete all existing products
+        // Pehle saare existing products delete karo
         await Product.deleteMany({});
-        console.log('Products deleted');
+        console.log('Products deleted'); // Confirmation message
 
-        // Insert new products
+        // Naye products insert karo
         await Product.insertMany(products);
-        console.log('Products seeded successfully');
+        console.log('Products seeded successfully'); // Success message
 
-        // Close connection
+        // Database connection close karo
         mongoose.connection.close();
     } catch (err) {
-        console.error('Error seeding data:', err);
-        process.exit(1);
+        console.error('Error seeding data:', err); // Error handle karo
+        process.exit(1); // Process terminate karo
     }
 };
 
-// Run the seed function
-seedDB(); 
+// Seed function run karo
+seedDB();

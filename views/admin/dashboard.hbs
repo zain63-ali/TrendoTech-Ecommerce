@@ -1,11 +1,13 @@
+{{!-- Admin Dashboard Page - Admin panel ka main dashboard --}}
 <div class="container my-5">
     <div class="row">
-        <!-- Sidebar -->
+        {{!-- Admin Navigation Sidebar --}}
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Admin Menu</h5>
                 </div>
+                {{!-- Admin menu links --}}
                 <div class="list-group list-group-flush">
                     <a href="/admin/dashboard" class="list-group-item list-group-item-action active">
                         <i class="fas fa-tachometer-alt me-2"></i> Dashboard
@@ -35,12 +37,13 @@
             </div>
         </div>
         
-        <!-- Main Content -->
+        {{!-- Main Dashboard Content --}}
         <div class="col-md-9">
             <h2 class="mb-4">Admin Dashboard</h2>
             
+            {{!-- Statistics Cards Row --}}
             <div class="row">
-                <!-- Users Card -->
+                {{!-- Users Statistics Card --}}
                 <div class="col-md-3 mb-4">
                     <div class="card border-primary h-100">
                         <div class="card-body text-center">
@@ -52,7 +55,7 @@
                     </div>
                 </div>
                 
-                <!-- Products Card -->
+                {{!-- Products Statistics Card --}}
                 <div class="col-md-3 mb-4">
                     <div class="card border-success h-100">
                         <div class="card-body text-center">
@@ -64,7 +67,7 @@
                     </div>
                 </div>
                 
-                <!-- Orders Card -->
+                {{!-- Orders Statistics Card --}}
                 <div class="col-md-3 mb-4">
                     <div class="card border-warning h-100">
                         <div class="card-body text-center">
@@ -76,7 +79,7 @@
                     </div>
                 </div>
                 
-                <!-- Sellers Card -->
+                {{!-- Sellers Statistics Card --}}
                 <div class="col-md-3 mb-4">
                     <div class="card border-danger h-100">
                         <div class="card-body text-center">
@@ -88,7 +91,7 @@
                     </div>
                 </div>
                 
-                <!-- Blogs Card -->
+                {{!-- Blogs Statistics Card --}}
                 <div class="col-md-3 mb-4">
                     <div class="card border-info h-100">
                         <div class="card-body text-center">
@@ -100,7 +103,7 @@
                     </div>
                 </div>
                 
-                <!-- Feedbacks Card -->
+                {{!-- Feedbacks Statistics Card --}}
                 <div class="col-md-3 mb-4">
                     <div class="card border-secondary h-100">
                         <div class="card-body text-center">

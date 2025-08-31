@@ -1,11 +1,13 @@
+{{!-- Seller Add Product Page - Naya product add karne ka form --}}
 <div class="container my-5">
     <div class="row">
-        <!-- Sidebar -->
+        {{!-- Seller Navigation Sidebar --}}
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">Seller Menu</h5>
                 </div>
+                {{!-- Seller menu links --}}
                 <div class="list-group list-group-flush">
                     <a href="/seller/dashboard" class="list-group-item list-group-item-action">
                         <i class="fas fa-tachometer-alt me-2"></i> Dashboard
@@ -23,30 +25,35 @@
             </div>
         </div>
         
-        <!-- Main Content -->
+        {{!-- Main Add Product Content --}}
         <div class="col-md-9">
             <div class="card">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">Add New Product</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Error message display --}}
                     {{#if formError}}
                     <div class="alert alert-danger mb-4">
                         {{formError}}
                     </div>
                     {{/if}}
                     
+                    {{!-- Product creation form --}}
                     <form action="/seller/products" method="POST" enctype="multipart/form-data">
+                        {{!-- Product name field --}}
                         <div class="mb-3">
                             <label for="name" class="form-label">Product Name</label>
                             <input type="text" class="form-control" id="name" name="name" required>
                         </div>
                         
+                        {{!-- Product description field --}}
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>
                             <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
                         </div>
                         
+                        {{!-- Price aur category fields row --}}
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="price" class="form-label">Price (PKR)</label>
@@ -65,17 +72,20 @@
                             </div>
                         </div>
                         
+                        {{!-- Product image upload field --}}
                         <div class="mb-3">
                             <label for="productImage" class="form-label">Product Image</label>
                             <input type="file" class="form-control" id="productImage" name="productImage" accept="image/*" required>
                             <div class="form-text">Upload an image file. The image should be square or 4:3 ratio for best results.</div>
                         </div>
                         
+                        {{!-- Stock availability checkbox --}}
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="inStock" name="inStock" value="true" checked>
                             <label class="form-check-label" for="inStock">In Stock</label>
                         </div>
                         
+                        {{!-- Form action buttons --}}
                         <div class="d-flex justify-content-between">
                             <a href="/seller/dashboard" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-success">Add Product</button>
@@ -85,4 +95,4 @@
             </div>
         </div>
     </div>
-</div> 
+</div>

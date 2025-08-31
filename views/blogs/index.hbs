@@ -1,9 +1,11 @@
+{{!-- Blog Posts Index Page - Blog posts ki listing aur search --}}
 <div class="container my-5">
     <div class="row">
-        <!-- Main Content -->
+        {{!-- Main Blog Content --}}
         <div class="col-lg-8">
             <h1 class="mb-4">Blog Posts</h1>
             
+            {{!-- Search results notification --}}
             {{#if searchQuery}}
             <div class="alert alert-info mb-4">
                 Showing search results for: <strong>{{searchQuery}}</strong>
@@ -11,12 +13,14 @@
             </div>
             {{/if}}
             
+            {{!-- Success message display --}}
             {{#if successMessage}}
             <div class="alert alert-success mb-4">
                 {{successMessage}}
             </div>
             {{/if}}
 
+            {{!-- Blog posts list --}}
             {{#if blogs.length}}
                 {{#each blogs}}
                 <div class="card mb-4">
@@ -33,6 +37,7 @@
                                     <p class="card-text">{{this.summary}}</p>
                                 </div>
                                 <div class="mt-auto">
+                                    {{!-- Blog meta information --}}
                                     <div class="d-flex justify-content-between align-items-center">
                                         <small class="text-muted">
                                             By {{#if this.author}}{{this.author.name}}{{else}}Unknown Author{{/if}} | {{formatDate this.createdAt}}
@@ -48,6 +53,7 @@
                     </div>
                 </div>
                 {{/each}}
+            {{!-- Empty state message --}}
             {{else}}
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i> No blog posts found.
@@ -55,14 +61,15 @@
             {{/if}}
         </div>
 
-        <!-- Sidebar -->
+        {{!-- Blog Sidebar --}}
         <div class="col-lg-4">
-            <!-- Search -->
+            {{!-- Search Card --}}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Search</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Blog search form --}}
                     <form action="/blogs" method="GET">
                         <div class="input-group">
                             <input type="text" class="form-control" name="search" placeholder="Search blogs..." value="{{searchQuery}}">
@@ -74,12 +81,13 @@
                 </div>
             </div>
 
-            <!-- Categories -->
+            {{!-- Categories Card --}}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Categories</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Category filter links --}}
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center {{#if (eq currentCategory 'all')}}active{{/if}}">
                             <a href="/blogs" class="text-decoration-none {{#if (eq currentCategory 'all')}}text-white{{else}}text-dark{{/if}}">All Categories</a>
@@ -95,12 +103,13 @@
                 </div>
             </div>
 
-            <!-- Recent Posts -->
+            {{!-- Recent Posts Card --}}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Recent Posts</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Recent blog posts list --}}
                     <ul class="list-group list-group-flush">
                         {{#each recentPosts}}
                         <li class="list-group-item p-2">
@@ -116,7 +125,7 @@
                 </div>
             </div>
 
-            <!-- Admin Actions -->
+            {{!-- Admin Actions Card (sirf admins ke liye) --}}
             {{#if (eq user.role 'admin')}}
             <div class="card mb-4">
                 <div class="card-header bg-dark text-white">
@@ -131,4 +140,4 @@
             {{/if}}
         </div>
     </div>
-</div> 
+</div>

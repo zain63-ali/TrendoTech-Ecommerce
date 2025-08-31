@@ -1,11 +1,13 @@
+{{!-- Admin Add User Page - Naya user add karne ka form --}}
 <div class="container my-5">
     <div class="row">
-        <!-- Sidebar -->
+        {{!-- Admin Navigation Sidebar --}}
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Admin Menu</h5>
                 </div>
+                {{!-- Admin menu links --}}
                 <div class="list-group list-group-flush">
                     <a href="/admin/dashboard" class="list-group-item list-group-item-action">
                         <i class="fas fa-tachometer-alt me-2"></i> Dashboard
@@ -29,7 +31,7 @@
             </div>
         </div>
         
-        <!-- Main Content -->
+        {{!-- Main Add User Content --}}
         <div class="col-md-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Add New User</h2>
@@ -38,23 +40,27 @@
                 </a>
             </div>
             
+            {{!-- Success message display --}}
             {{#if formSuccess}}
             <div class="alert alert-success mb-4">
                 {{formSuccess}}
             </div>
             {{/if}}
             
+            {{!-- Error message display --}}
             {{#if formError}}
             <div class="alert alert-danger mb-4">
                 {{formError}}
             </div>
             {{/if}}
             
+            {{!-- Add User Form Card --}}
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">User Information</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- User creation form --}}
                     <form action="/admin/users/add" method="POST">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -67,6 +73,7 @@
                             </div>
                         </div>
                         
+                        {{!-- Password fields row --}}
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
@@ -79,6 +86,7 @@
                             </div>
                         </div>
                         
+                        {{!-- Role and phone fields row --}}
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="role" class="form-label">User Role <span class="text-danger">*</span></label>
@@ -94,11 +102,13 @@
                             </div>
                         </div>
                         
+                        {{!-- Address field --}}
                         <div class="mb-3">
                             <label for="address" class="form-label">Address</label>
                             <textarea class="form-control" id="address" name="address" rows="3"></textarea>
                         </div>
                         
+                        {{!-- Form action buttons --}}
                         <div class="d-flex justify-content-end gap-2">
                             <a href="/admin/users" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-success">
@@ -112,12 +122,14 @@
     </div>
 </div>
 
+{{!-- JavaScript for form validation --}}
 <script>
 // Password confirmation validation
 document.getElementById('confirmPassword').addEventListener('input', function() {
     const password = document.getElementById('password').value;
     const confirmPassword = this.value;
     
+    // Check if passwords match
     if (password !== confirmPassword) {
         this.setCustomValidity('Passwords do not match');
     } else {
@@ -125,6 +137,7 @@ document.getElementById('confirmPassword').addEventListener('input', function() 
     }
 });
 
+// Re-validate confirm password when main password changes
 document.getElementById('password').addEventListener('input', function() {
     const confirmPassword = document.getElementById('confirmPassword');
     if (confirmPassword.value) {

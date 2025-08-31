@@ -1,61 +1,64 @@
-const express = require('express');
-const router = express.Router();
-const Blog = require('../models/Blog');
-const User = require('../models/User');
-const { isAuthenticated, isAdmin } = require('../middleware/auth');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+// Blog routes - Blog management ke liye routes
+const express = require('express'); // Express framework
+const router = express.Router(); // Router create karo
+const Blog = require('../models/Blog'); // Blog model
+const User = require('../models/User'); // User model
+const { isAuthenticated, isAdmin } = require('../middleware/auth'); // Authentication middleware
+const multer = require('multer'); // File upload ke liye
+const path = require('path'); // Path utilities
+const fs = require('fs'); // File system operations
 
-// Configure multer for blog image uploads
+// Blog image uploads ke liye multer configure karo
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const uploadPath = path.join(__dirname, '../public/uploads/blogs');
-        // Create directory if it doesn't exist
+        // Directory create karo agar exist nahi karti
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true });
         }
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        // Generate unique filename
+        // Unique filename generate karo
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, 'blog-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
+// Multer upload configuration
 const upload = multer({ 
-    storage: storage,
+    storage: storage, // Storage configuration
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
+        fileSize: 5 * 1024 * 1024 // 5MB file size limit
     },
     fileFilter: function (req, file, cb) {
-        // Check if file is an image
+        // Check karo ke file image hai ya nahi
         if (file.mimetype.startsWith('image/')) {
-            cb(null, true);
+            cb(null, true); // Image files allow karo
         } else {
-            cb(new Error('Only image files are allowed!'), false);
+            cb(new Error('Only image files are allowed!'), false); // Non-image files reject karo
         }
     }
 });
 
-// Get all blogs
+// GET - Saare blogs dikhane ke liye route
 router.get('/', async (req, res) => {
     try {
-        let query = { isPublished: true };
+        let query = { isPublished: true }; // Sirf published blogs
         let pageTitle = 'All Blog Posts';
         
-        // Filter by category if specified
+        // Category filter apply karo agar specified hai
         if (req.query.category) {
             query.category = req.query.category;
             pageTitle = `${req.query.category.charAt(0).toUpperCase() + req.query.category.slice(1)} Blogs`;
         }
         
-        // Handle search query
+        // Search query handle karo
         if (req.query.search) {
             const searchTerm = req.query.search.trim();
-            const searchRegex = new RegExp(searchTerm, 'i');
+            const searchRegex = new RegExp(searchTerm, 'i'); // Case insensitive search
             
+            // Multiple fields mein search karo
             query.$or = [
                 { title: searchRegex },
                 { summary: searchRegex },
@@ -66,30 +69,32 @@ router.get('/', async (req, res) => {
             pageTitle = `Search Results: ${searchTerm}`;
         }
         
-        // Get blogs with optional filtering
+        // Blogs find karo filtering ke saath
         const blogs = await Blog.find(query)
-            .populate('author', 'name')
-            .sort({ createdAt: -1 });
+            .populate('author', 'name') // Author name populate karo
+            .sort({ createdAt: -1 }); // Latest blogs pehle
         
-        // Get categories for the sidebar
+        // Sidebar ke liye categories nikalo
         const categories = await Blog.distinct('category');
         
-        // Get recent posts
+        // Recent posts nikalo
         const recentPosts = await Blog.find({ isPublished: true })
             .sort({ createdAt: -1 })
             .limit(5)
             .select('title createdAt');
         
+        // Blogs index page render karo
         res.render('blogs/index', {
             title: pageTitle,
-            blogs,
-            categories,
-            recentPosts,
+            blogs, // Blogs list
+            categories, // Categories list
+            recentPosts, // Recent posts
             currentCategory: req.query.category || 'all',
             searchQuery: req.query.search || ''
         });
     } catch (err) {
-        console.error('Blogs error:', err);
+        console.error('Blogs error:', err); // Error log karo
+        // Error page render karo
         res.status(500).render('error', {
             title: 'Error',
             message: 'Server error, please try again later'
@@ -97,12 +102,14 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Get blog details
+// GET - Single blog ki details dikhane ke liye route
 router.get('/:id', async (req, res) => {
     try {
+        // Blog find karo aur author details populate karo
         const blog = await Blog.findById(req.params.id)
             .populate('author', 'name');
         
+        // Check karo ke blog exist karta hai aur published hai
         if (!blog || !blog.isPublished) {
             return res.status(404).render('error', {
                 title: 'Blog Not Found',
@@ -110,7 +117,7 @@ router.get('/:id', async (req, res) => {
             });
         }
         
-        // Check if author exists
+        // Author information check karo
         if (!blog.author) {
             return res.status(500).render('error', {
                 title: 'Error',
@@ -118,45 +125,47 @@ router.get('/:id', async (req, res) => {
             });
         }
         
-        // Increment view count
+        // View count increment karo
         blog.views = (blog.views || 0) + 1;
-        await blog.save();
+        await blog.save(); // Database mein save karo
         
-        // Get categories for the sidebar
+        // Sidebar ke liye categories nikalo
         const categories = await Blog.distinct('category');
         
-        // Get recent posts
+        // Recent posts nikalo (current blog exclude kar ke)
         const recentPosts = await Blog.find({ 
             isPublished: true,
-            _id: { $ne: blog._id } 
+            _id: { $ne: blog._id } // Current blog exclude karo
         })
             .sort({ createdAt: -1 })
             .limit(5)
             .select('title createdAt');
         
-        // Get related posts from the same category
+        // Same category se related posts nikalo
         const relatedPosts = await Blog.find({
             category: blog.category,
-            _id: { $ne: blog._id },
+            _id: { $ne: blog._id }, // Current blog exclude karo
             isPublished: true
         })
             .sort({ createdAt: -1 })
             .limit(3)
             .populate('author', 'name');
         
-        // Get current URL for sharing
+        // Sharing ke liye current URL nikalo
         const currentUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
         
+        // Blog details page render karo
         res.render('blogs/details', {
             title: blog.title,
-            blog,
-            categories,
-            recentPosts,
-            relatedPosts,
-            currentUrl
+            blog, // Blog details
+            categories, // Categories list
+            recentPosts, // Recent posts
+            relatedPosts, // Related posts
+            currentUrl // Current URL for sharing
         });
     } catch (err) {
-        console.error('Blog details error:', err);
+        console.error('Blog details error:', err); // Error log karo
+        // Error page render karo
         res.status(500).render('error', {
             title: 'Error',
             message: 'Server error, please try again later'
@@ -164,20 +173,21 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Admin routes for blog management - these could be moved to admin.js later
-// Add blog form
+// Admin routes for blog management - yeh admin.js mein move ho sakte hain
+// GET - Naya blog add karne ka form dikhane ke liye route
 router.get('/admin/add', isAuthenticated, isAdmin, (req, res) => {
+    // Add blog form render karo
     res.render('blogs/admin/add', {
         title: 'Add New Blog Post'
     });
 });
 
-// Create blog
+// POST - Naya blog create karne ke liye route
 router.post('/admin/add', isAuthenticated, isAdmin, upload.single('image'), async (req, res) => {
     try {
-        const { title, content, summary, category, tags } = req.body;
+        const { title, content, summary, category, tags } = req.body; // Form data nikalo
         
-        // Check if image was uploaded
+        // Check karo ke image upload hui hai ya nahi
         if (!req.file) {
             return res.render('blogs/admin/add', {
                 title: 'Add New Blog Post',
@@ -185,27 +195,28 @@ router.post('/admin/add', isAuthenticated, isAdmin, upload.single('image'), asyn
             });
         }
         
-        // Create image URL path
+        // Image URL path create karo
         const imageUrl = `/uploads/blogs/${req.file.filename}`;
         
-        // Create new blog
+        // Naya blog create karo
         const newBlog = new Blog({
             title,
             content,
             summary,
             category,
             imageUrl,
-            author: req.session.user.id,
-            tags: tags ? tags.split(',').map(tag => tag.trim()) : []
+            author: req.session.user.id, // Current admin user
+            tags: tags ? tags.split(',').map(tag => tag.trim()) : [] // Tags array mein convert karo
         });
         
-        await newBlog.save();
+        await newBlog.save(); // Database mein save karo
         
+        // Success message ke saath blogs page par redirect karo
         res.redirect('/blogs?message=Blog post created successfully');
     } catch (err) {
-        console.error('Add blog error:', err);
+        console.error('Add blog error:', err); // Error log karo
         
-        // Delete uploaded file if there was an error
+        // Agar error hai to uploaded file delete kar do
         if (req.file) {
             const filePath = path.join(__dirname, '../public/uploads/blogs', req.file.filename);
             if (fs.existsSync(filePath)) {
@@ -213,6 +224,7 @@ router.post('/admin/add', isAuthenticated, isAdmin, upload.single('image'), asyn
             }
         }
         
+        // Error message ke saath form render karo
         res.render('blogs/admin/add', {
             title: 'Add New Blog Post',
             formError: 'Server error, please try again'
@@ -220,24 +232,28 @@ router.post('/admin/add', isAuthenticated, isAdmin, upload.single('image'), asyn
     }
 });
 
-// Edit blog form
+// GET - Blog edit form dikhane ke liye route
 router.get('/admin/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
     try {
+        // Blog find karo
         const blog = await Blog.findById(req.params.id);
         
         if (!blog) {
+            // Agar blog nahi mila
             return res.status(404).render('error', {
                 title: 'Blog Not Found',
                 message: 'The requested blog post could not be found'
             });
         }
         
+        // Edit blog form render karo
         res.render('blogs/admin/edit', {
             title: 'Edit Blog Post',
-            blog
+            blog // Blog details
         });
     } catch (err) {
-        console.error('Edit blog form error:', err);
+        console.error('Edit blog form error:', err); // Error log karo
+        // Error page render karo
         res.status(500).render('error', {
             title: 'Error',
             message: 'Server error, please try again later'
@@ -245,34 +261,38 @@ router.get('/admin/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
     }
 });
 
-// Update blog
+// POST - Blog update karne ke liye route
 router.post('/admin/edit/:id', isAuthenticated, isAdmin, async (req, res) => {
     try {
-        const { title, content, summary, category, imageUrl, tags, isPublished } = req.body;
+        const { title, content, summary, category, imageUrl, tags, isPublished } = req.body; // Form data nikalo
         
+        // Update data prepare karo
         const updateData = {
             title,
             content,
             summary,
             category,
             imageUrl,
-            tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
-            isPublished: isPublished === 'on',
-            updatedAt: new Date()
+            tags: tags ? tags.split(',').map(tag => tag.trim()) : [], // Tags array mein convert karo
+            isPublished: isPublished === 'on', // Checkbox value check karo
+            updatedAt: new Date() // Update time set karo
         };
         
+        // Blog update karo
         const blog = await Blog.findByIdAndUpdate(req.params.id, updateData, { new: true });
         
         if (!blog) {
+            // Agar blog nahi mila
             return res.status(404).render('error', {
                 title: 'Blog Not Found',
                 message: 'The requested blog post could not be found'
             });
         }
         
+        // Success message ke saath admin blogs page par redirect karo
         res.redirect('/admin/blogs?message=Blog post updated successfully');
     } catch (err) {
-        console.error('Update blog error:', err);
+        console.error('Update blog error:', err); // Error log karo
         res.redirect(`/blogs/admin/edit/${req.params.id}?error=Server error, please try again`);
     }
 });
@@ -495,4 +515,5 @@ const createSampleBlogs = async () => {
 // Run the seed script
 createSampleBlogs();
 
+// Router export karo
 module.exports = router; 

@@ -1,11 +1,13 @@
+{{!-- User Profile Page - Account settings aur profile management --}}
 <div class="container my-5">
     <div class="row">
-        <!-- Sidebar -->
+        {{!-- Account Navigation Sidebar --}}
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Account Menu</h5>
                 </div>
+                {{!-- Account menu links --}}
                 <div class="list-group list-group-flush">
                     <a href="/users/profile" class="list-group-item list-group-item-action active">
                         <i class="fas fa-user me-2"></i> My Profile
@@ -16,11 +18,13 @@
                     <a href="/wishlist" class="list-group-item list-group-item-action">
                         <i class="fas fa-heart me-2"></i> My Wishlist
                     </a>
+                    {{!-- Seller dashboard link (sirf sellers ke liye) --}}
                     {{#if (eq user.role 'seller')}}
                     <a href="/seller/dashboard" class="list-group-item list-group-item-action">
                         <i class="fas fa-store me-2"></i> Seller Dashboard
                     </a>
                     {{/if}}
+                    {{!-- Admin dashboard link (sirf admins ke liye) --}}
                     {{#if (eq user.role 'admin')}}
                     <a href="/admin/dashboard" class="list-group-item list-group-item-action">
                         <i class="fas fa-cog me-2"></i> Admin Dashboard
@@ -33,26 +37,29 @@
             </div>
         </div>
         
-        <!-- Main Content -->
+        {{!-- Main Profile Content --}}
         <div class="col-md-9">
+            {{!-- Success message display --}}
             {{#if formSuccess}}
             <div class="alert alert-success mb-4">
                 {{formSuccess}}
             </div>
             {{/if}}
             
+            {{!-- Error message display --}}
             {{#if formError}}
             <div class="alert alert-danger mb-4">
                 {{formError}}
             </div>
             {{/if}}
             
-            <!-- Account Information -->
+            {{!-- Account Information Card --}}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Account Information</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Profile update form --}}
                     <form action="/users/profile/update" method="POST">
                         <div class="mb-3">
                             <label for="name" class="form-label">Full Name</label>
@@ -62,10 +69,12 @@
                             <label for="email" class="form-label">Email Address</label>
                             <input type="email" class="form-control" id="email" name="email" value="{{user.email}}" required>
                         </div>
+                        {{!-- Account type (read-only) --}}
                         <div class="mb-3">
                             <label class="form-label">Account Type</label>
                             <input type="text" class="form-control" value="{{#if (eq user.role 'admin')}}Administrator{{else if (eq user.role 'seller')}}Seller{{else}}Customer{{/if}}" readonly>
                         </div>
+                        {{!-- Member since date (read-only) --}}
                         <div class="mb-3">
                             <label class="form-label">Member Since</label>
                             <input type="text" class="form-control" value="{{formatDate user.createdAt}}" readonly>
@@ -75,12 +84,13 @@
                 </div>
             </div>
             
-            <!-- Change Password -->
+            {{!-- Change Password Card --}}
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Change Password</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Password change form --}}
                     <form action="/users/profile/password" method="POST">
                         <div class="mb-3">
                             <label for="currentPassword" class="form-label">Current Password</label>
@@ -103,14 +113,17 @@
     </div>
 </div>
 
+{{!-- JavaScript for password validation --}}
 <script>
+    // Password change form validation
     document.querySelector('form[action="/users/profile/password"]').addEventListener('submit', function(e) {
         const newPassword = document.getElementById('newPassword').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         
+        // Password match validation
         if (newPassword !== confirmPassword) {
             e.preventDefault();
             alert('New passwords do not match!');
         }
     });
-</script> 
+</script>

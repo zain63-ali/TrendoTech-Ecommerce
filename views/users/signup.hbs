@@ -1,36 +1,47 @@
+{{!-- Signup Page - User registration form --}}
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
+            {{!-- Signup card container --}}
             <div class="card shadow">
+                {{!-- Card header with title --}}
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">Create an Account</h3>
                 </div>
+                {{!-- Card body with form --}}
                 <div class="card-body p-4">
+                    {{!-- Error message display --}}
                     {{#if formError}}
                     <div class="alert alert-danger">
                         {{formError}}
                     </div>
                     {{/if}}
                     
+                    {{!-- Signup form --}}
                     <form action="/users/signup" method="POST" id="signupForm">
+                        {{!-- Full name input field --}}
                         <div class="mb-3">
                             <label for="name" class="form-label">Full Name</label>
                             <input type="text" class="form-control" id="name" name="name" required>
                         </div>
+                        {{!-- Email input field --}}
                         <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
                             <input type="email" class="form-control" id="email" name="email" required>
                             <div class="form-text">We'll never share your email with anyone else.</div>
                         </div>
+                        {{!-- Password input field --}}
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" required minlength="6">
                             <div class="form-text">Password must be at least 6 characters long.</div>
                         </div>
+                        {{!-- Confirm password field --}}
                         <div class="mb-3">
                             <label for="confirmPassword" class="form-label">Confirm Password</label>
                             <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
                         </div>
+                        {{!-- Account type selection --}}
                         <div class="mb-3">
                             <label for="role" class="form-label">Account Type</label>
                             <select class="form-select" id="role" name="role" required>
@@ -39,13 +50,16 @@
                             </select>
                             <div class="form-text">Select 'Seller' if you want to sell products on our platform.</div>
                         </div>
+                        {{!-- Terms and conditions checkbox --}}
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="terms" required>
                             <label class="form-check-label" for="terms">I agree to the <a href="/terms-conditions">Terms and Conditions</a></label>
                         </div>
+                        {{!-- Submit button --}}
                         <button type="submit" class="btn btn-primary w-100">Sign Up</button>
                     </form>
                 </div>
+                {{!-- Card footer with login link --}}
                 <div class="card-footer bg-light text-center">
                     <p class="mb-0">Already have an account? <a href="/users/login">Login here</a></p>
                 </div>
@@ -54,14 +68,17 @@
     </div>
 </div>
 
+{{!-- Client-side password validation script --}}
 <script>
+    // Form submit event listener - Password confirmation check
     document.getElementById('signupForm').addEventListener('submit', function(e) {
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
         
+        // Agar passwords match nahi karte to form submit prevent karo
         if (password !== confirmPassword) {
             e.preventDefault();
             alert('Passwords do not match!');
         }
     });
-</script> 
+</script>

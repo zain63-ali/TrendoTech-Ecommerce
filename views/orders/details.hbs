@@ -1,11 +1,13 @@
+{{!-- Order Details Page - Specific order ki detailed view --}}
 <div class="container my-5">
     <div class="row">
-        <!-- Sidebar -->
+        {{!-- Account Navigation Sidebar --}}
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Account Menu</h5>
                 </div>
+                {{!-- Account menu links --}}
                 <div class="list-group list-group-flush">
                     <a href="/users/profile" class="list-group-item list-group-item-action">
                         <i class="fas fa-user me-2"></i> My Profile
@@ -16,11 +18,13 @@
                     <a href="/wishlist" class="list-group-item list-group-item-action">
                         <i class="fas fa-heart me-2"></i> My Wishlist
                     </a>
+                    {{!-- Seller dashboard link (sirf sellers ke liye) --}}
                     {{#if (eq user.role 'seller')}}
                     <a href="/seller/dashboard" class="list-group-item list-group-item-action">
                         <i class="fas fa-store me-2"></i> Seller Dashboard
                     </a>
                     {{/if}}
+                    {{!-- Admin dashboard link (sirf admins ke liye) --}}
                     {{#if (eq user.role 'admin')}}
                     <a href="/admin/dashboard" class="list-group-item list-group-item-action">
                         <i class="fas fa-cog me-2"></i> Admin Dashboard
@@ -33,20 +37,23 @@
             </div>
         </div>
         
-        <!-- Main Content -->
+        {{!-- Main Order Details Content --}}
         <div class="col-md-9">
+            {{!-- Success message display --}}
             {{#if successMessage}}
             <div class="alert alert-success mb-4">
                 {{successMessage}}
             </div>
             {{/if}}
             
+            {{!-- Error message display --}}
             {{#if error}}
             <div class="alert alert-danger mb-4">
                 {{error}}
             </div>
             {{/if}}
             
+            {{!-- Page header with order number aur back button --}}
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Order #{{order.orderNumber}}</h2>
                 <a href="/my-orders" class="btn btn-outline-primary">
@@ -54,14 +61,18 @@
                 </a>
             </div>
             
+            {{!-- Order info aur shipping details row --}}
             <div class="row mb-4">
                 <div class="col-md-6">
+                    {{!-- Order Information Card --}}
                     <div class="card mb-4">
                         <div class="card-header bg-primary text-white">
                             <h5 class="mb-0">Order Information</h5>
                         </div>
                         <div class="card-body">
+                            {{!-- Order date --}}
                             <p><strong>Order Date:</strong> {{formatDate order.createdAt}}</p>
+                            {{!-- Order status with colored badges --}}
                             <p><strong>Order Status:</strong> 
                                 {{#if (eq order.status 'pending')}}
                                 <span class="badge bg-warning text-dark">Pending</span>
@@ -75,6 +86,7 @@
                                 <span class="badge bg-danger">Cancelled</span>
                                 {{/if}}
                             </p>
+                            {{!-- Payment method with icons --}}
                             <p><strong>Payment Method:</strong> 
                                 {{#if (eq order.paymentMethod 'jazzcash')}}
                                 <i class="fas fa-mobile-alt me-2"></i>JazzCash
@@ -85,6 +97,7 @@
                                 {{/if}}
                             </p>
                             
+                            {{!-- Cancel order button (sirf pending/processing orders ke liye) --}}
                             {{#if (or (eq order.status 'pending') (eq order.status 'processing'))}}
                             <form action="/my-orders/{{order._id}}/cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
                                 <button type="submit" class="btn btn-sm btn-danger">
@@ -97,13 +110,17 @@
                 </div>
                 
                 <div class="col-md-6">
+                    {{!-- Shipping Information Card --}}
                     <div class="card">
                         <div class="card-header bg-primary text-white">
                             <h5 class="mb-0">Shipping Information</h5>
                         </div>
                         <div class="card-body">
+                            {{!-- Customer name --}}
                             <p><strong>Name:</strong> {{order.shippingDetails.fullName}}</p>
+                            {{!-- Customer email --}}
                             <p><strong>Email:</strong> {{order.shippingDetails.email}}</p>
+                            {{!-- Complete shipping address --}}
                             <p><strong>Address:</strong><br>
                                 {{order.shippingDetails.address}}<br>
                                 {{order.shippingDetails.city}}, {{order.shippingDetails.state}} {{order.shippingDetails.zipCode}}<br>
@@ -114,6 +131,7 @@
                 </div>
             </div>
             
+            {{!-- Order Items Table Card --}}
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Order Items</h5>
@@ -121,6 +139,7 @@
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
+                            {{!-- Table headers --}}
                             <thead>
                                 <tr>
                                     <th>Product</th>
@@ -129,9 +148,11 @@
                                     <th>Total</th>
                                 </tr>
                             </thead>
+                            {{!-- Order items loop --}}
                             <tbody>
                                 {{#each order.items}}
                                 <tr>
+                                    {{!-- Product info with image aur category --}}
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <img src="{{this.imageUrl}}" class="img-thumbnail me-3" alt="{{this.name}}" style="width: 50px; height: 50px; object-fit: cover;">
@@ -151,8 +172,11 @@
                                             </div>
                                         </div>
                                     </td>
+                                    {{!-- Individual product price --}}
                                     <td>Rs. {{formatPrice this.price}}</td>
+                                    {{!-- Quantity ordered --}}
                                     <td>{{this.quantity}}</td>
+                                    {{!-- Line total (price × quantity) --}}
                                     <td>Rs. {{formatPrice (multiply this.price this.quantity)}}</td>
                                 </tr>
                                 {{/each}}
@@ -162,6 +186,7 @@
                 </div>
             </div>
             
+            {{!-- Order Summary Card --}}
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Order Summary</h5>
@@ -169,19 +194,23 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6 offset-md-6">
+                            {{!-- Subtotal amount --}}
                             <div class="d-flex justify-content-between mb-2">
                                 <strong>Subtotal:</strong>
                                 <span>{{formatPrice order.subtotal}}</span>
                             </div>
+                            {{!-- Tax amount (10%) --}}
                             <div class="d-flex justify-content-between mb-2">
                                 <strong>Tax (10%):</strong>
                                 <span>{{formatPrice order.tax}}</span>
                             </div>
+                            {{!-- Shipping cost (free) --}}
                             <div class="d-flex justify-content-between mb-2">
                                 <strong>Shipping:</strong>
                                 <span>Free</span>
                             </div>
                             <hr>
+                            {{!-- Final total amount --}}
                             <div class="d-flex justify-content-between">
                                 <h5>Total:</h5>
                                 <h5>{{formatPrice order.total}}</h5>
@@ -194,22 +223,26 @@
     </div>
 </div>
 
+{{!-- JavaScript helper functions --}}
 <script>
-    // Helper functions for formatting
+    // Handlebars helper - Date formatting ke liye
     Handlebars.registerHelper('formatDate', function(date) {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(date).toLocaleDateString('en-US', options);
     });
     
+    // Handlebars helper - Price formatting ke liye
     Handlebars.registerHelper('formatPrice', function(price) {
         return parseFloat(price).toFixed(2);
     });
     
+    // Handlebars helper - Multiplication ke liye (price × quantity)
     Handlebars.registerHelper('multiply', function(a, b) {
         return a * b;
     });
     
+    // Handlebars helper - Logical OR operation ke liye
     Handlebars.registerHelper('or', function() {
         return Array.prototype.slice.call(arguments, 0, -1).some(Boolean);
     });
-</script> 
+</script>

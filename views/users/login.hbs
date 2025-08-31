@@ -1,36 +1,55 @@
+{{!-- Login Page - User authentication form --}}
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
+            {{!-- Login card container --}}
             <div class="card shadow">
+                {{!-- Card header with title --}}
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">Login to Your Account</h3>
                 </div>
+                {{!-- Card body with form --}}
                 <div class="card-body p-4">
+                    {{!-- Error message display --}}
                     {{#if formError}}
                     <div class="alert alert-danger">
                         {{formError}}
                     </div>
                     {{/if}}
                     
+                    {{!-- Success message display --}}
+                    {{#if formSuccess}}
+                    <div class="alert alert-success">
+                        {{formSuccess}}
+                    </div>
+                    {{/if}}
+                    
+                    {{!-- Login form --}}
                     <form action="/users/login" method="POST">
+                        {{!-- Email input field --}}
                         <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
                             <input type="email" class="form-control" id="email" name="email" required>
                         </div>
+                        {{!-- Password input field --}}
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
+                        {{!-- Remember me checkbox --}}
                         <div class="mb-3 form-check">
                             <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
                             <label class="form-check-label" for="rememberMe">Remember me</label>
                         </div>
+                        {{!-- Submit button --}}
                         <button type="submit" class="btn btn-primary w-100">Login</button>
                     </form>
+                    {{!-- Forgot password link --}}
                     <div class="text-center mt-3">
-                        <a href="#" class="text-decoration-none">Forgot your password?</a>
+                        <a href="/users/forgot" class="text-decoration-none">Forgot your password?</a>
                     </div>
                 </div>
+                {{!-- Card footer with signup link --}}
                 <div class="card-footer bg-light text-center">
                     <p class="mb-0">Don't have an account? <a href="/users/signup">Sign up here</a></p>
                 </div>

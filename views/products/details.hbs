@@ -1,4 +1,6 @@
+{{!-- Product Details Page - Individual product ki complete details --}}
 <div class="container mt-4">
+    {{!-- Breadcrumb navigation --}}
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -19,15 +21,16 @@
     </nav>
 
     <div class="row">
-        <!-- Product Image -->
+        {{!-- Product Image Section --}}
         <div class="col-md-6 mb-4">
             <div class="card p-3">
                 <img src="{{product.imageUrl}}" class="img-fluid rounded" alt="{{product.name}}">
             </div>
         </div>
         
-        <!-- Product Details -->
+        {{!-- Product Details Section --}}
         <div class="col-md-6">
+            {{!-- Category aur stock status badges --}}
             <div class="mb-2">
                 <span class="badge bg-primary">{{product.category}}</span>
                 {{#if product.inStock}}
@@ -36,20 +39,26 @@
                 <span class="badge bg-danger">Out of Stock</span>
                 {{/if}}
             </div>
+            {{!-- Product name --}}
             <h1 class="h2 mb-2">{{product.name}}</h1>
+            {{!-- Product price --}}
             <div class="mb-3">
                 <span class="h3 text-primary">Rs. {{product.price}}</span>
             </div>
+            {{!-- Seller information (agar available hai) --}}
             {{#if product.seller}}
             <div class="mb-3">
                 <small class="text-muted">Sold by: {{product.seller.name}}</small>
             </div>
             {{/if}}
+            {{!-- Product description --}}
             <div class="mb-4">
                 <p>{{product.description}}</p>
             </div>
             
+            {{!-- Quantity selector aur action buttons --}}
             <div class="d-flex align-items-center mb-4">
+                {{!-- Quantity input group --}}
                 <div class="input-group me-3" style="width: 130px;">
                     <button class="btn btn-outline-secondary" type="button" id="decreaseQty">
                         <i class="fas fa-minus"></i>
@@ -60,6 +69,7 @@
                     </button>
                 </div>
                 
+                {{!-- Add to cart button (stock status ke basis par) --}}
                 {{#if product.inStock}}
                 <button class="btn btn-primary btn-lg add-to-cart-detail me-2" data-product-id="{{product._id}}">
                     <i class="fas fa-cart-plus me-2"></i>Add to Cart
@@ -70,6 +80,7 @@
                 </button>
                 {{/if}}
                 
+                {{!-- Wishlist toggle button --}}
                 <button class="btn btn-outline-danger btn-lg toggle-wishlist-btn {{#if isInWishlist}}in-wishlist{{/if}}" data-product-id="{{product._id}}">
                     {{#if isInWishlist}}
                     <i class="fas fa-heart"></i>
@@ -79,6 +90,7 @@
                 </button>
             </div>
             
+            {{!-- Shipping information card --}}
             <div class="card mb-4">
                 <div class="card-body">
                     <h5><i class="fas fa-truck text-primary me-2"></i>Shipping Information</h5>
@@ -86,6 +98,7 @@
                 </div>
             </div>
             
+            {{!-- Return policy card --}}
             <div class="card">
                 <div class="card-body">
                     <h5><i class="fas fa-undo text-primary me-2"></i>Return Policy</h5>
@@ -95,7 +108,7 @@
         </div>
     </div>
     
-    <!-- Customer Feedback Section -->
+    {{!-- Customer Feedback Section --}}
     <div class="my-5">
         <div class="row">
             <div class="col-12">
@@ -103,30 +116,64 @@
                     <i class="fas fa-comments text-primary me-2"></i>Customer Feedback
                 </h3>
                 
-                <!-- Feedback Form -->
+                {{!-- Feedback Form Section --}}
                 {{#if user}}
-                    <div class="card mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">
-                                <i class="fas fa-edit me-2"></i>Leave Your Feedback
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <form action="/feedback/add" method="POST">
-                                <input type="hidden" name="productId" value="{{product._id}}">
-                                <div class="mb-3">
-                                    <label for="comment" class="form-label">Your Comment</label>
-                                    <textarea class="form-control" id="comment" name="comment" rows="4" 
-                                              placeholder="Share your thoughts about this product..." 
-                                              required maxlength="1000"></textarea>
-                                    <div class="form-text">Maximum 1000 characters</div>
+                    {{!-- Agar user ne pehle feedback diya hai --}}
+                    {{#if userFeedback}}
+                        <div class="card mb-4 border-success">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-check-circle me-2"></i>Your Feedback
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-success mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>You have already submitted feedback for this product.</strong>
                                 </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-paper-plane me-2"></i>Submit Feedback
-                                </button>
-                            </form>
+                                {{!-- User ka existing feedback display --}}
+                                <div class="bg-light p-3 rounded">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="mb-1">
+                                            <i class="fas fa-user-circle text-success me-1"></i>
+                                            {{userFeedback.user.name}}
+                                        </h6>
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            {{formatDate userFeedback.createdAt}}
+                                        </small>
+                                    </div>
+                                    <p class="mb-0">{{userFeedback.comment}}</p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    {{!-- Agar user ne abhi tak feedback nahi diya --}}
+                    {{else}}
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-edit me-2"></i>Leave Your Feedback
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                {{!-- Feedback submission form --}}
+                                <form action="/feedback/add" method="POST">
+                                    <input type="hidden" name="productId" value="{{product._id}}">
+                                    <div class="mb-3">
+                                        <label for="comment" class="form-label">Your Comment</label>
+                                        <textarea class="form-control" id="comment" name="comment" rows="4" 
+                                                  placeholder="Share your thoughts about this product..." 
+                                                  required maxlength="1000"></textarea>
+                                        <div class="form-text">Maximum 1000 characters</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane me-2"></i>Submit Feedback
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {{/if}}
+                {{!-- Agar user login nahi hai --}}
                 {{else}}
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
@@ -134,7 +181,7 @@
                     </div>
                 {{/if}}
                 
-                <!-- Display Existing Feedback -->
+                {{!-- Existing Feedback Display Section --}}
                 {{#if feedbacks.length}}
                     <div class="card">
                         <div class="card-header">
@@ -143,20 +190,24 @@
                             </h5>
                         </div>
                         <div class="card-body">
+                            {{!-- Feedback items loop --}}
                             {{#each feedbacks}}
                                 <div class="border-bottom pb-3 mb-3 {{#unless @last}}{{else}}border-bottom-0 pb-0 mb-0{{/unless}}">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
+                                            {{!-- Feedback user name --}}
                                             <h6 class="mb-1">
                                                 <i class="fas fa-user-circle text-primary me-1"></i>
                                                 {{user.name}}
                                             </h6>
+                                            {{!-- Feedback date --}}
                                             <small class="text-muted">
                                                 <i class="fas fa-calendar me-1"></i>
                                                 {{formatDate createdAt}}
                                             </small>
                                         </div>
                                     </div>
+                                    {{!-- Feedback comment content --}}
                                     <div class="feedback-comment bg-light p-3 rounded">
                                         <p class="mb-0">{{comment}}</p>
                                     </div>
@@ -164,6 +215,7 @@
                             {{/each}}
                         </div>
                     </div>
+                {{!-- Agar koi feedback nahi hai --}}
                 {{else}}
                     <div class="card">
                         <div class="card-body text-center py-4">
@@ -177,14 +229,16 @@
         </div>
     </div>
     
-    <!-- Related Products -->
+    {{!-- Related Products Section --}}
     <div class="my-5">
         <h3 class="mb-4">You May Also Like</h3>
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {{!-- Related products loop --}}
             {{#each relatedProducts}}
             <div class="col">
                 {{> product-card product=this}}
             </div>
+            {{!-- Agar koi related products nahi hain --}}
             {{else}}
             <div class="col-12">
                 <div class="alert alert-info">No related products available.</div>

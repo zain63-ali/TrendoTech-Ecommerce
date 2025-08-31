@@ -1,220 +1,413 @@
+// Express framework import kar rahe hain web server banane ke liye
 const express = require('express');
+// Router banate hain jo different URLs handle karega
 const router = express.Router();
-const Product = require('../models/Product');
-const Order = require('../models/Order');
-const { isAuthenticated } = require('../middleware/auth');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 
-// Configure multer for file uploads
+// Database models import kar rahe hain
+const Product = require('../models/Product'); // Products ki information ke liye
+const Order = require('../models/Order'); // Orders ki information ke liye  
+const Cart = require('../models/Cart'); // Cart ki information ke liye
+
+// Authentication middleware - check karta hai user login hai ya nahi
+const { isAuthenticated } = require('../middleware/auth');
+
+// File upload ke liye libraries
+const multer = require('multer'); // File upload handle karta hai
+const path = require('path'); // File paths handle karta hai
+const fs = require('fs'); // File system operations ke liye
+
+// Multer configuration - file upload ke liye settings
 const storage = multer.diskStorage({
+    // Yeh function decide karta hai ke files kahan save karni hain
     destination: function (req, file, cb) {
         const uploadPath = path.join(__dirname, '../public/uploads/screenshots');
-        // Create directory if it doesn't exist
+        // Agar folder exist nahi karta to banao
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath, { recursive: true });
         }
-        cb(null, uploadPath);
+        cb(null, uploadPath); // Yeh path use karo
     },
+    // Yeh function file ka naam decide karta hai
     filename: function (req, file, cb) {
-        // Generate unique filename
+        // Unique filename banate hain taki duplicate na ho
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, 'jazzcash-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
+// Upload middleware banate hain jo file upload handle karega
 const upload = multer({ 
-    storage: storage,
+    storage: storage, // Upar wali storage settings use karo
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
+        fileSize: 5 * 1024 * 1024 // Maximum 5MB ki file allow hai
     },
     fileFilter: function (req, file, cb) {
-        // Check if file is an image
+        // Sirf image files allow hain
         if (file.mimetype.startsWith('image/')) {
-            cb(null, true);
+            cb(null, true); // File accept karo
         } else {
-            cb(new Error('Only image files are allowed!'), false);
+            cb(new Error('Only image files are allowed!'), false); // Reject karo
         }
     }
 });
 
-// Define a simple cart that uses session storage
-// In a real app, you would use a database to store cart items
-
-// View cart
-router.get('/', (req, res) => {
-    // Initialize cart if it doesn't exist in session
-    if (!req.session.cart) req.session.cart = [];
+// Helper function - user ka cart laane ya banane ke liye
+async function getUserCart(userId) {
+    // Database mein user ka cart dhundo aur products ki details bhi load karo
+    let cart = await Cart.findOne({ user: userId }).populate('items.product');
     
-    // Calculate cart total
-    let cartTotal = 0;
-    if (req.session.cart && req.session.cart.length > 0) {
-        cartTotal = req.session.cart.reduce((total, item) => {
-            return total + (item.product.price * item.quantity);
-        }, 0);
+    // Agar cart nahi mila to naya banao
+    if (!cart) {
+        cart = new Cart({ user: userId, items: [] }); // Empty cart banao
+        await cart.save(); // Database mein save karo
     }
-    
-    res.render('cart/index', {
-        title: 'Your Shopping Cart',
-        cartItems: req.session.cart || [],
-        cartTotal: cartTotal.toFixed(2)
-    });
+    return cart; // Cart return karo
+}
+
+// Cart page dikhane ke liye route - GET /cart
+router.get('/', async (req, res) => {
+    try {
+        let cartItems = []; // Cart ki items ki list
+        let cartTotal = 0; // Cart ka total price
+        
+        // Check karo ke user login hai ya nahi
+        if (req.session.user) {
+            // User login hai - database se cart lao
+            const cart = await getUserCart(req.session.user.id);
+            
+            // Cart items ko proper format mein convert karo
+            cartItems = cart.items.map(item => ({
+                product: item.product, // Product ki details
+                quantity: item.quantity // Kitni quantity hai
+            }));
+            
+            // Total price calculate karo
+            cartTotal = await cart.calculateTotal();
+        } else {
+            // User login nahi hai - session se cart lao
+            if (!req.session.cart) req.session.cart = []; // Agar cart nahi hai to empty banao
+            cartItems = req.session.cart;
+            
+            // Agar items hain to total calculate karo
+            if (cartItems.length > 0) {
+                cartTotal = cartItems.reduce((total, item) => {
+                    return total + (item.product.price * item.quantity);
+                }, 0);
+            }
+        }
+        
+        // Cart page render karo aur data pass karo
+        res.render('cart/index', {
+            title: 'Your Shopping Cart',
+            cartItems: cartItems,
+            cartTotal: cartTotal.toFixed(2) // 2 decimal places mein
+        });
+    } catch (err) {
+        // Agar koi error aaye to console mein print karo
+        console.error('Cart view error:', err);
+        
+        // Empty cart page dikhao error ke saath
+        res.render('cart/index', {
+            title: 'Your Shopping Cart',
+            cartItems: [],
+            cartTotal: '0.00',
+            error: 'Error loading cart'
+        });
+    }
 });
 
-// Add item to cart
+// Cart mein product add karne ke liye route - POST /cart/add
 router.post('/add', async (req, res) => {
     try {
+        // Request body se productId aur quantity nikalo
         const { productId, quantity = 1 } = req.body;
         console.log('Adding to cart:', productId, quantity);
         
-        // Initialize session if needed
-        if (!req.session.cart) req.session.cart = [];
-        
-        // Get product details
+        // Database se product ki details lao
         const product = await Product.findById(productId);
         if (!product) {
+            // Agar product nahi mila to error return karo
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
         
-        // Check if the product is already in the cart
-        const existingItemIndex = req.session.cart.findIndex(item => 
-            item.product._id.toString() === productId.toString()
-        );
-        
-        if (existingItemIndex > -1) {
-            // Update quantity if product already in cart
-            req.session.cart[existingItemIndex].quantity += parseInt(quantity);
-            console.log('Updated quantity in cart');
-        } else {
-            // Add new product to cart
-            req.session.cart.push({
-                product,
-                quantity: parseInt(quantity)
+        // Check karo ke user login hai ya nahi
+        if (req.session.user) {
+            // User login hai - database mein cart save karo
+            const cart = await getUserCart(req.session.user.id);
+            
+            // Check karo ke yeh product pehle se cart mein hai ya nahi
+            const existingItemIndex = cart.items.findIndex(item => 
+                item.product._id.toString() === productId.toString()
+            );
+            
+            if (existingItemIndex > -1) {
+                // Product pehle se hai - quantity badhao
+                cart.items[existingItemIndex].quantity += parseInt(quantity);
+            } else {
+                // Naya product hai - cart mein add karo
+                cart.items.push({
+                    product: productId,
+                    quantity: parseInt(quantity)
+                });
+            }
+            
+            // Cart ko database mein save karo
+            await cart.save();
+            // Products ki details load karo
+            await cart.populate('items.product');
+            
+            // Total price aur items count calculate karo
+            const cartTotal = await cart.calculateTotal();
+            const cartCount = cart.getItemCount();
+            
+            // Success response bhejo
+            res.json({ 
+                success: true, 
+                cartCount: cartCount,
+                cartTotal: cartTotal.toFixed(2)
             });
-            console.log('Added new product to cart');
-        }
-        
-        // Calculate new cart total
-        let cartTotal = 0;
-        if (req.session.cart.length > 0) {
-            cartTotal = req.session.cart.reduce((total, item) => {
+        } else {
+            // User login nahi hai - session cart use karo
+            if (!req.session.cart) req.session.cart = [];
+            
+            // Check karo ke product pehle se session cart mein hai ya nahi
+            const existingItemIndex = req.session.cart.findIndex(item => 
+                item.product._id.toString() === productId.toString()
+            );
+            
+            if (existingItemIndex > -1) {
+                // Product pehle se hai - quantity badhao
+                req.session.cart[existingItemIndex].quantity += parseInt(quantity);
+            } else {
+                // Naya product hai - session cart mein add karo
+                req.session.cart.push({
+                    product,
+                    quantity: parseInt(quantity)
+                });
+            }
+            
+            // Session cart ka total calculate karo
+            const cartTotal = req.session.cart.reduce((total, item) => {
                 return total + (item.product.price * item.quantity);
             }, 0);
+            
+            // Success response bhejo
+            res.json({ 
+                success: true, 
+                cartCount: req.session.cart.length,
+                cartTotal: cartTotal.toFixed(2)
+            });
         }
-        
-        res.json({ 
-            success: true, 
-            cartCount: req.session.cart.length,
-            cartTotal: cartTotal.toFixed(2)
-        });
     } catch (err) {
+        // Error ko console mein print karo
         console.error('Cart add error:', err);
+        // Error response bhejo
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
-// Remove item from cart
-router.post('/remove', (req, res) => {
-    const { productId } = req.body;
-    console.log('Removing from cart:', productId);
-    
-    if (req.session && req.session.cart) {
-        req.session.cart = req.session.cart.filter(item => 
-            item.product._id.toString() !== productId.toString()
-        );
-        
-        // Calculate new cart total
-        let cartTotal = 0;
-        if (req.session.cart.length > 0) {
-            cartTotal = req.session.cart.reduce((total, item) => {
-                return total + (item.product.price * item.quantity);
-            }, 0);
-        }
-        
-        res.json({ 
-            success: true, 
-            cartCount: req.session.cart.length,
-            cartTotal: cartTotal.toFixed(2)
-        });
-    } else {
-        res.json({ success: true, cartCount: 0, cartTotal: "0.00" });
-    }
-});
-
-// Clear cart
-router.post('/clear', (req, res) => {
-    console.log('Clearing cart');
-    if (req.session) {
-        req.session.cart = [];
-    }
-    
-    res.json({ success: true, cartTotal: "0.00" });
-});
-
-// Update quantity
-router.post('/update-quantity', (req, res) => {
+// Cart se product remove karne ke liye route - POST /cart/remove
+router.post('/remove', async (req, res) => {
     try {
-        const { productId, quantity } = req.body;
-        console.log('Updating quantity:', productId, quantity);
+        // Request body se productId nikalo
+        const { productId } = req.body;
+        console.log('Removing from cart:', productId);
         
-        if (!req.session || !req.session.cart) {
-            return res.json({ success: false, message: 'Cart not initialized' });
-        }
-        
-        const cartItem = req.session.cart.find(item => 
-            item.product._id.toString() === productId.toString()
-        );
-        
-        if (cartItem) {
-            cartItem.quantity = parseInt(quantity);
+        // Check karo ke user login hai ya nahi
+        if (req.session.user) {
+            // User login hai - database se remove karo
+            const cart = await getUserCart(req.session.user.id);
             
-            // Calculate new cart total
-            let cartTotal = 0;
-            if (req.session.cart.length > 0) {
-                cartTotal = req.session.cart.reduce((total, item) => {
-                    return total + (item.product.price * item.quantity);
-                }, 0);
-            }
+            // Cart items ko filter kar ke specified product ko remove karo
+            cart.items = cart.items.filter(item => 
+                item.product._id.toString() !== productId.toString()
+            );
             
+            // Updated cart ko database mein save karo
+            await cart.save();
+            // Products ki details load karo
+            await cart.populate('items.product');
+            
+            // Naya total aur count calculate karo
+            const cartTotal = await cart.calculateTotal();
+            const cartCount = cart.getItemCount();
+            
+            // Success response bhejo
             res.json({ 
                 success: true, 
-                itemTotal: (cartItem.product.price * cartItem.quantity).toFixed(2),
+                cartCount: cartCount,
                 cartTotal: cartTotal.toFixed(2)
             });
         } else {
-            res.json({ success: false, message: 'Item not found in cart' });
+            // User login nahi hai - session cart se remove karo
+            if (req.session && req.session.cart) {
+                // Session cart ko filter kar ke product remove karo
+                req.session.cart = req.session.cart.filter(item => 
+                    item.product._id.toString() !== productId.toString()
+                );
+                
+                // Session cart ka naya total calculate karo
+                const cartTotal = req.session.cart.reduce((total, item) => {
+                    return total + (item.product.price * item.quantity);
+                }, 0);
+                
+                // Success response bhejo
+                res.json({ 
+                    success: true, 
+                    cartCount: req.session.cart.length,
+                    cartTotal: cartTotal.toFixed(2)
+                });
+            } else {
+                // Agar session cart nahi hai to empty response bhejo
+                res.json({ success: true, cartCount: 0, cartTotal: "0.00" });
+            }
         }
     } catch (err) {
+        // Error ko console mein print karo
+        console.error('Cart remove error:', err);
+        // Error response bhejo
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// Pura cart clear karne ke liye route - POST /cart/clear
+router.post('/clear', async (req, res) => {
+    try {
+        console.log('Clearing cart');
+        
+        // Check karo ke user login hai ya nahi
+        if (req.session.user) {
+            // User login hai - database cart clear karo
+            const cart = await getUserCart(req.session.user.id);
+            cart.items = []; // Items array ko empty kar do
+            await cart.save(); // Database mein save karo
+        } else {
+            // User login nahi hai - session cart clear karo
+            if (req.session) {
+                req.session.cart = []; // Session cart ko empty kar do
+            }
+        }
+        
+        // Success response bhejo
+        res.json({ success: true, cartTotal: "0.00" });
+    } catch (err) {
+        // Error ko console mein print karo
+        console.error('Clear cart error:', err);
+        // Error response bhejo
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+});
+
+// Cart item ki quantity update karne ke liye route - POST /cart/update-quantity
+router.post('/update-quantity', async (req, res) => {
+    try {
+        // Request body se productId aur nai quantity nikalo
+        const { productId, quantity } = req.body;
+        console.log('Updating quantity:', productId, quantity);
+        
+        // Check karo ke user login hai ya nahi
+        if (req.session.user) {
+            // User login hai - database cart update karo
+            const cart = await getUserCart(req.session.user.id);
+            
+            // Cart mein specified product dhundo
+            const cartItem = cart.items.find(item => 
+                item.product._id.toString() === productId.toString()
+            );
+            
+            if (cartItem) {
+                // Product mila - quantity update karo
+                cartItem.quantity = parseInt(quantity);
+                await cart.save(); // Database mein save karo
+                await cart.populate('items.product'); // Product details load karo
+                
+                // Naya total aur item total calculate karo
+                const cartTotal = await cart.calculateTotal();
+                const itemTotal = cartItem.product.price * cartItem.quantity;
+                
+                // Success response bhejo
+                res.json({ 
+                    success: true, 
+                    itemTotal: itemTotal.toFixed(2),
+                    cartTotal: cartTotal.toFixed(2)
+                });
+            } else {
+                // Product nahi mila
+                res.json({ success: false, message: 'Item not found in cart' });
+            }
+        } else {
+            // User login nahi hai - session cart update karo
+            if (!req.session || !req.session.cart) {
+                return res.json({ success: false, message: 'Cart not initialized' });
+            }
+            
+            // Session cart mein product dhundo
+            const cartItem = req.session.cart.find(item => 
+                item.product._id.toString() === productId.toString()
+            );
+            
+            if (cartItem) {
+                // Product mila - quantity update karo
+                cartItem.quantity = parseInt(quantity);
+                
+                // Session cart ka naya total calculate karo
+                const cartTotal = req.session.cart.reduce((total, item) => {
+                    return total + (item.product.price * item.quantity);
+                }, 0);
+                
+                // Success response bhejo
+                res.json({ 
+                    success: true, 
+                    itemTotal: (cartItem.product.price * cartItem.quantity).toFixed(2),
+                    cartTotal: cartTotal.toFixed(2)
+                });
+            } else {
+                // Product nahi mila
+                res.json({ success: false, message: 'Item not found in cart' });
+            }
+        }
+    } catch (err) {
+        // Error ko console mein print karo
         console.error('Update quantity error:', err);
+        // Error response bhejo
         res.json({ success: false, message: 'Error updating quantity' });
     }
 });
 
-// Checkout page (authenticated users only)
-router.get('/checkout', isAuthenticated, (req, res) => {
-    // Check if cart has items
-    if (!req.session.cart || req.session.cart.length === 0) {
-        return res.redirect('/cart?error=Your cart is empty');
+// Checkout page dikhane ke liye route - GET /cart/checkout (sirf logged-in users ke liye)
+router.get('/checkout', isAuthenticated, async (req, res) => {
+    try {
+        // Database se logged-in user ka cart lao
+        const cart = await getUserCart(req.session.user.id);
+        
+        // Check karo ke cart mein items hain ya nahi
+        if (!cart.items || cart.items.length === 0) {
+            return res.redirect('/cart?error=Your cart is empty');
+        }
+        
+        // Cart totals calculate karo
+        const subtotal = await cart.calculateTotal(); // Items ka total price
+        const tax = subtotal * 0.1; // 10% tax lagao
+        const total = subtotal + tax; // Final total
+        
+        // Checkout page render karo aur data pass karo
+        res.render('cart/checkout', {
+            title: 'Checkout',
+            cartItems: cart.items.map(item => ({
+                product: item.product, // Product ki details
+                quantity: item.quantity // Quantity
+            })),
+            subtotal: subtotal.toFixed(2), // 2 decimal places
+            tax: tax.toFixed(2),
+            total: total.toFixed(2),
+            user: req.session.user // User ki information
+        });
+    } catch (err) {
+        // Error ko console mein print karo
+        console.error('Checkout page error:', err);
+        // Cart page par redirect karo error ke saath
+        res.redirect('/cart?error=Error loading checkout page');
     }
-    
-    // Calculate cart totals
-    const cartItems = req.session.cart;
-    const subtotal = cartItems.reduce((total, item) => {
-        return total + (item.product.price * item.quantity);
-    }, 0);
-    
-    const tax = subtotal * 0.1; // 10% tax
-    const total = subtotal + tax;
-    
-    res.render('cart/checkout', {
-        title: 'Checkout',
-        cartItems: cartItems,
-        subtotal: subtotal.toFixed(2),
-        tax: tax.toFixed(2),
-        total: total.toFixed(2),
-        user: req.session.user
-    });
 });
 
 // Process checkout (place order)
@@ -261,13 +454,15 @@ router.post('/place-order', isAuthenticated, upload.single('transactionScreensho
             }
         }
         
-        // Check if cart has items
-        if (!req.session.cart || req.session.cart.length === 0) {
+        // Get cart from database for logged-in user
+        const cart = await getUserCart(req.session.user.id);
+        
+        if (!cart.items || cart.items.length === 0) {
             return res.redirect('/cart?error=Your cart is empty');
         }
         
         // Calculate totals
-        const cartItems = req.session.cart;
+        const cartItems = cart.items;
         const subtotal = cartItems.reduce((total, item) => {
             return total + (item.product.price * item.quantity);
         }, 0);
@@ -333,8 +528,9 @@ router.post('/place-order', isAuthenticated, upload.single('transactionScreensho
         
         await newOrder.save();
         
-        // Clear the cart
-        req.session.cart = [];
+        // Clear the cart from database
+        cart.items = [];
+        await cart.save();
         
         // Redirect to order confirmation
         res.redirect('/cart/order-confirmation?orderId=' + newOrder._id);

@@ -1,4 +1,6 @@
+{{!-- Cart Index Page - Shopping cart display aur management --}}
 <div class="container my-5">
+    {{!-- Page header with title aur continue shopping link --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Your Shopping Cart</h1>
         <a href="/products" class="btn btn-outline-primary">
@@ -6,13 +8,17 @@
         </a>
     </div>
     
+    {{!-- Cart items display agar cart mein items hain --}}
     {{#if cartItems.length}}
     <div class="row">
+        {{!-- Cart items table section --}}
         <div class="col-lg-8">
             <div class="card mb-4">
                 <div class="card-body">
+                    {{!-- Responsive table container --}}
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
+                            {{!-- Table headers --}}
                             <thead>
                                 <tr>
                                     <th scope="col">Product</th>
@@ -22,14 +28,19 @@
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
+                            {{!-- Cart items loop --}}
                             <tbody>
                                 {{#each cartItems}}
                                 <tr>
+                                    {{!-- Product info column --}}
                                     <td>
                                         <div class="d-flex align-items-center">
+                                            {{!-- Product image --}}
                                             <img src="{{this.product.imageUrl}}" class="img-thumbnail me-3" style="width: 80px; height: 80px; object-fit: cover;" alt="{{this.product.name}}">
                                             <div>
+                                                {{!-- Product name --}}
                                                 <h6 class="mb-0">{{this.product.name}}</h6>
+                                                {{!-- Product category display --}}
                                                 <small class="text-muted">
                                                     {{#if (eq this.product.category 'men-clothing')}}
                                                         Men's Clothing
@@ -44,19 +55,26 @@
                                             </div>
                                         </div>
                                     </td>
+                                    {{!-- Product price --}}
                                     <td>Rs. {{this.product.price}}</td>
+                                    {{!-- Quantity controls --}}
                                     <td>
                                         <div class="input-group input-group-sm" style="width: 100px;">
+                                            {{!-- Decrease quantity button --}}
                                             <button class="btn btn-outline-secondary quantity-btn" type="button" data-action="decrease" data-product-id="{{this.product._id}}">
                                                 <i class="fas fa-minus"></i>
                                             </button>
+                                            {{!-- Quantity display --}}
                                             <input type="text" class="form-control text-center quantity-input" value="{{this.quantity}}" readonly>
+                                            {{!-- Increase quantity button --}}
                                             <button class="btn btn-outline-secondary quantity-btn" type="button" data-action="increase" data-product-id="{{this.product._id}}">
                                                 <i class="fas fa-plus"></i>
                                             </button>
                                         </div>
                                     </td>
+                                    {{!-- Item subtotal calculation --}}
                                     <td class="item-subtotal">Rs. {{multiply this.product.price this.quantity}}</td>
+                                    {{!-- Remove item button --}}
                                     <td>
                                         <button class="btn btn-sm btn-outline-danger remove-item-btn" data-product-id="{{this.product._id}}">
                                             <i class="fas fa-trash"></i>
@@ -70,6 +88,7 @@
                 </div>
             </div>
             
+            {{!-- Clear entire cart button --}}
             <div class="d-flex justify-content-end">
                 <button id="clear-cart" class="btn btn-outline-danger">
                     <i class="fas fa-trash me-2"></i>Clear Cart
@@ -77,29 +96,36 @@
             </div>
         </div>
         
+        {{!-- Order summary sidebar --}}
         <div class="col-lg-4">
             <div class="card">
+                {{!-- Summary card header --}}
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Order Summary</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Subtotal display --}}
                     <div class="d-flex justify-content-between mb-2">
                         <span>Subtotal:</span>
                         <span id="cart-subtotal">{{cartTotal}}</span>
                     </div>
+                    {{!-- Shipping cost (free) --}}
                     <div class="d-flex justify-content-between mb-2">
                         <span>Shipping:</span>
                         <span>Free</span>
                     </div>
+                    {{!-- Tax calculation (10%) --}}
                     <div class="d-flex justify-content-between mb-2">
                         <span>Tax (10%):</span>
                         <span id="cart-tax">{{multiply cartTotal 0.1}}</span>
                     </div>
                     <hr>
+                    {{!-- Final total with tax --}}
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Total:</strong>
                         <strong id="cart-total">{{multiply cartTotal 1.1}}</strong>
                     </div>
+                    {{!-- Checkout button --}}
                     <button class="btn btn-danger w-100" id="checkout-btn">
                         <i class="fas fa-lock me-2"></i>Proceed to Checkout
                     </button>
@@ -107,6 +133,7 @@
             </div>
         </div>
     </div>
+    {{!-- Empty cart message agar cart khali hai --}}
     {{else}}
     <div class="card text-center p-5">
         <div class="card-body">
@@ -119,9 +146,10 @@
     {{/if}}
 </div>
 
+{{!-- JavaScript helper function --}}
 <script>
-    // Helper function for handlebars
+    // Handlebars helper function - Price calculation ke liye
     Handlebars.registerHelper('multiply', function(a, b) {
         return (a * b).toFixed(2);
     });
-</script> 
+</script>

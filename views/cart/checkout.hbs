@@ -1,4 +1,6 @@
+{{!-- Checkout Page - Order placement form with payment options --}}
 <div class="container my-5">
+    {{!-- Page header with title aur back to cart link --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Checkout</h1>
         <a href="/cart" class="btn btn-outline-primary">
@@ -6,6 +8,7 @@
         </a>
     </div>
     
+    {{!-- Error message display agar koi error hai --}}
     {{#if error}}
     <div class="alert alert-danger mb-4">
         {{error}}
@@ -13,14 +16,17 @@
     {{/if}}
     
     <div class="row">
-        <!-- Checkout Form -->
+        {{!-- Checkout Form Section --}}
         <div class="col-lg-8">
             <div class="card mb-4">
+                {{!-- Shipping details card header --}}
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Shipping Details</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Main checkout form with file upload support --}}
                     <form action="/cart/place-order" method="POST" id="checkout-form" enctype="multipart/form-data">
+                        {{!-- Customer information row --}}
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="fullName" class="form-label">Full Name *</label>
@@ -32,11 +38,13 @@
                             </div>
                         </div>
                         
+                        {{!-- Shipping address field --}}
                         <div class="mb-3">
                             <label for="address" class="form-label">Address</label>
                             <input type="text" class="form-control" id="address" name="address" required>
                         </div>
                         
+                        {{!-- City aur state row --}}
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="city" class="form-label">City *</label>
@@ -48,6 +56,7 @@
                             </div>
                         </div>
                         
+                        {{!-- Zip code aur country row --}}
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="zipCode" class="form-label">Zip/Postal Code *</label>
@@ -62,11 +71,13 @@
                             </div>
                         </div>
                         
+                        {{!-- Payment Method Selection Card --}}
                         <div class="card mb-4">
                             <div class="card-header bg-primary text-white">
                                 <h5 class="mb-0">Payment Method</h5>
                             </div>
                             <div class="card-body">
+                                {{!-- Cash on Delivery option --}}
                                 <div class="form-check mb-2">
                                     <input class="form-check-input" type="radio" name="paymentMethod" id="cashOnDelivery" value="cash_on_delivery" checked>
                                     <label class="form-check-label" for="cashOnDelivery">
@@ -74,34 +85,38 @@
                                     </label>
                                 </div>
                                 
+                                {{!-- JazzCash payment option --}}
                                 <div class="form-check mb-2">
                                     <input class="form-check-input" type="radio" name="paymentMethod" id="jazzcash" value="jazzcash">
                                     <label class="form-check-label" for="jazzcash">
                                         <i class="fas fa-mobile-alt me-2"></i>JazzCash
                                     </label>
                                 </div>
-                                <div class="jazzcash-fields mt-3" style="display: none;">
+                                {{!-- JazzCash payment fields (hidden by default) --}}
+                                {{!-- Bank Transfer payment fields (hidden by default) --}}
+                                <div class="bank-transfer-fields mt-3" style="display: none;">
                                     <div class="alert alert-info">
-                                        <strong>JazzCash Payment Instructions:</strong>
+                                        <strong>Bank Transfer Instructions:</strong>
                                         <ol class="mb-0 mt-2">
-                                            <li>Send payment to: <strong>0328-7573860</strong></li>
-                                            <li>Use your order total as the amount</li>
-                                            <li>Take a screenshot of the transaction</li>
-                                            <li>Upload the screenshot below</li>
+                                            <li>Bank: HBL</li>
+                                            <li>Account Title: TrendoTech</li>
+                                            <li>Account Number: 12345678901234</li>
+                                            <li>Upload transaction receipt below</li>
                                         </ol>
                                     </div>
                                     <div class="row mb-3">
                                         <div class="col-md-6">
-                                            <label for="jazzcashNumber" class="form-label">Your JazzCash Number *</label>
-                                            <input type="text" class="form-control" id="jazzcashNumber" name="jazzcashNumber" placeholder="03XX XXXXXXX">
+                                            <label for="bankTransactionId" class="form-label">Transaction ID *</label>
+                                            <input type="text" class="form-control" id="bankTransactionId" name="bankTransactionId" placeholder="Enter transaction ID">
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="transactionScreenshot" class="form-label">Transaction Screenshot *</label>
-                                            <input type="file" class="form-control" id="transactionScreenshot" name="transactionScreenshot" accept="image/*">
-                                            <div class="form-text">Upload a clear screenshot of your JazzCash transaction</div>
+                                            <label for="bankReceipt" class="form-label">Transaction Receipt *</label>
+                                            <input type="file" class="form-control" id="bankReceipt" name="bankReceipt" accept="image/*">
+                                            <div class="form-text">Upload a clear photo of your bank receipt</div>
                                         </div>
                                     </div>
                                 </div>
+                                {{!-- Bank Transfer payment option --}}
                                 <div class="form-check mb-2">
                                     <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="bank_transfer">
                                     <label class="form-check-label" for="bankTransfer">
@@ -153,6 +168,7 @@
                             </div>
                         </div>
                         
+                        {{!-- Terms and conditions checkbox --}}
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="termsAgree" required>
                             <label class="form-check-label" for="termsAgree">
@@ -160,6 +176,7 @@
                             </label>
                         </div>
                         
+                        {{!-- Place order submit button --}}
                         <button type="submit" class="btn btn-danger btn-lg w-100">
                             <i class="fas fa-lock me-2"></i>Place Order
                         </button>
@@ -168,26 +185,30 @@
             </div>
         </div>
         
-        <!-- Order Summary -->
+        {{!-- Order Summary Sidebar --}}
         <div class="col-lg-4">
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Order Summary</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Subtotal amount --}}
                     <div class="d-flex justify-content-between mb-2">
                         <span>Subtotal:</span>
                         <span>{{subtotal}}</span>
                     </div>
+                    {{!-- Shipping cost (free) --}}
                     <div class="d-flex justify-content-between mb-2">
                         <span>Shipping:</span>
                         <span>Free</span>
                     </div>
+                    {{!-- Tax calculation (10%) --}}
                     <div class="d-flex justify-content-between mb-2">
                         <span>Tax (10%):</span>
                         <span>{{tax}}</span>
                     </div>
                     <hr>
+                    {{!-- Final total amount --}}
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Total:</strong>
                         <strong>{{total}}</strong>
@@ -195,14 +216,17 @@
                 </div>
             </div>
             
+            {{!-- Order Items List Card --}}
             <div class="card">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">Order Items ({{cartItems.length}})</h5>
                 </div>
                 <div class="card-body p-0">
+                    {{!-- Cart items list --}}
                     <ul class="list-group list-group-flush">
                         {{#each cartItems}}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{!-- Product image aur details --}}
                             <div class="d-flex align-items-center">
                                 <img src="{{this.product.imageUrl}}" class="img-thumbnail me-3" style="width: 50px; height: 50px; object-fit: cover;" alt="{{this.product.name}}">
                                 <div>
@@ -210,6 +234,7 @@
                                     <small class="text-muted">Qty: {{this.quantity}}</small>
                                 </div>
                             </div>
+                            {{!-- Item total price (quantity * price) --}}
                             <span>Rs. {{multiply this.product.price this.quantity}}</span>
                         </li>
                         {{/each}}
@@ -220,7 +245,7 @@
     </div>
 </div>
 
-<!-- Terms and Conditions Modal -->
+{{!-- Terms and Conditions Modal --}}
 <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -228,6 +253,7 @@
                 <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            {{!-- Terms content --}}
             <div class="modal-body">
                 <h5>1. General Terms</h5>
                 <p>By placing an order through our website, you agree to these terms and conditions. We reserve the right to modify these terms at any time, so please review them frequently.</p>
@@ -354,11 +380,12 @@
         togglePaymentFields();
         
         // Enhanced form validation with Bootstrap support
+        // Checkout form submission ke liye validation
         document.getElementById('checkout-form').addEventListener('submit', function(e) {
             const form = this;
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
             
-            // Let Bootstrap handle basic validation first
+            // Bootstrap validation pehle check karein
             if (!form.checkValidity()) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -366,7 +393,7 @@
                 return false;
             }
             
-            // Additional custom validation for payment methods
+            // Payment methods ke liye additional custom validation
             if (paymentMethod === 'jazzcash') {
                 const jazzcashNumber = document.getElementById('jazzcashNumber')?.value?.trim();
                 const screenshot = document.getElementById('transactionScreenshot')?.files[0];
@@ -394,7 +421,7 @@
                 if (!accountTitle || !accountNumber || !bankName || !transactionId) {
                     e.preventDefault();
                     alert('Please fill in all bank transfer details');
-                    // Focus on first empty field
+                    // Pehle empty field par focus karein
                     if (!accountTitle) document.getElementById('accountTitle')?.focus();
                     else if (!accountNumber) document.getElementById('accountNumber')?.focus();
                     else if (!bankName) document.getElementById('bankName')?.focus();
@@ -410,7 +437,7 @@
                 }
             }
             
-            // If we get here, validation passed
+            // Agar yahan tak pahunche to validation pass ho gayi
             form.classList.add('was-validated');
         });
     });

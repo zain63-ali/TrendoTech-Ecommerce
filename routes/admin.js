@@ -1,26 +1,28 @@
-const express = require('express');
-const router = express.Router();
-const User = require('../models/User');
-const Product = require('../models/Product');
-const Blog = require('../models/Blog');
-const Order = require('../models/Order');
-const Feedback = require('../models/Feedback');
-const { isAdmin } = require('../middleware/auth');
+// Admin routes - Admin panel ke liye routes
+const express = require('express'); // Express framework
+const router = express.Router(); // Router create karo
+const User = require('../models/User'); // User model
+const Product = require('../models/Product'); // Product model
+const Blog = require('../models/Blog'); // Blog model
+const Order = require('../models/Order'); // Order model
+const Feedback = require('../models/Feedback'); // Feedback model
+const { isAdmin } = require('../middleware/auth'); // Admin authentication middleware
 
-// Apply admin middleware to all routes in this router
+// Saare admin routes par admin middleware apply karo
 router.use(isAdmin);
 
-// Admin Dashboard
+// GET - Admin dashboard dikhane ke liye route
 router.get('/dashboard', async (req, res) => {
     try {
-        // Get counts for dashboard
-        const userCount = await User.countDocuments();
-        const productCount = await Product.countDocuments();
-        const sellerCount = await User.countDocuments({ role: 'seller' });
-        const blogCount = await Blog.countDocuments();
-        const orderCount = await Order.countDocuments();
-        const feedbackCount = await Feedback.countDocuments();
+        // Dashboard ke liye counts nikalo
+        const userCount = await User.countDocuments(); // Total users
+        const productCount = await Product.countDocuments(); // Total products
+        const sellerCount = await User.countDocuments({ role: 'seller' }); // Total sellers
+        const blogCount = await Blog.countDocuments(); // Total blogs
+        const orderCount = await Order.countDocuments(); // Total orders
+        const feedbackCount = await Feedback.countDocuments(); // Total feedbacks
         
+        // Admin dashboard render karo
         res.render('admin/dashboard', {
             title: 'Admin Dashboard',
             userCount,
@@ -31,7 +33,8 @@ router.get('/dashboard', async (req, res) => {
             feedbackCount
         });
     } catch (err) {
-        console.error('Admin dashboard error:', err);
+        console.error('Admin dashboard error:', err); // Error log karo
+        // Error page render karo
         res.status(500).render('error', {
             title: 'Error',
             message: 'Server error, please try again later'
@@ -39,20 +42,22 @@ router.get('/dashboard', async (req, res) => {
     }
 });
 
-// Manage Orders
+// GET - Saare orders manage karne ke liye route
 router.get('/orders', async (req, res) => {
     try {
-        // Get all orders sorted by newest first
+        // Saare orders nikalo (newest first) aur user details populate karo
         const orders = await Order.find()
-            .sort({ createdAt: -1 })
-            .populate('user', 'name email');
+            .sort({ createdAt: -1 }) // Latest orders pehle
+            .populate('user', 'name email'); // User name aur email populate karo
         
+        // Admin orders page render karo
         res.render('admin/orders', {
             title: 'Manage Orders',
-            orders
+            orders // Orders list
         });
     } catch (err) {
-        console.error('Admin orders error:', err);
+        console.error('Admin orders error:', err); // Error log karo
+        // Error page render karo
         res.status(500).render('error', {
             title: 'Error',
             message: 'Server error, please try again later'
@@ -60,25 +65,29 @@ router.get('/orders', async (req, res) => {
     }
 });
 
-// View Order Details
+// GET - Single order ki details dikhane ke liye route (Admin view)
 router.get('/orders/:id', async (req, res) => {
     try {
+        // Order find karo aur user details populate karo
         const order = await Order.findById(req.params.id)
-            .populate('user', 'name email');
+            .populate('user', 'name email'); // User name aur email populate karo
         
         if (!order) {
+            // Agar order nahi mila
             return res.status(404).render('error', {
                 title: 'Not Found',
                 message: 'Order not found'
             });
         }
         
+        // Admin order details page render karo
         res.render('admin/order-details', {
-            title: `Order #${order.orderNumber}`,
-            order
+            title: `Order #${order.orderNumber}`, // Page title order number ke saath
+            order // Order details
         });
     } catch (err) {
-        console.error('Admin order details error:', err);
+        console.error('Admin order details error:', err); // Error log karo
+        // Error page render karo
         res.status(500).render('error', {
             title: 'Error',
             message: 'Server error, please try again later'

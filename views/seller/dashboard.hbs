@@ -1,11 +1,13 @@
+{{!-- Seller Dashboard Page - Seller ka main dashboard --}}
 <div class="container my-5">
     <div class="row">
-        <!-- Sidebar -->
+        {{!-- Seller Navigation Sidebar --}}
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">Seller Menu</h5>
                 </div>
+                {{!-- Seller menu links --}}
                 <div class="list-group list-group-flush">
                     <a href="/seller/dashboard" class="list-group-item list-group-item-action active">
                         <i class="fas fa-tachometer-alt me-2"></i> Dashboard
@@ -23,7 +25,7 @@
             </div>
         </div>
         
-        <!-- Main Content -->
+        {{!-- Main Seller Dashboard Content --}}
         <div class="col-md-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Seller Dashboard</h2>
@@ -32,19 +34,21 @@
                 </a>
             </div>
             
+            {{!-- Success message display --}}
             {{#if formSuccess}}
             <div class="alert alert-success mb-4">
                 {{formSuccess}}
             </div>
             {{/if}}
             
+            {{!-- Error message display --}}
             {{#if formError}}
             <div class="alert alert-danger mb-4">
                 {{formError}}
             </div>
             {{/if}}
             
-            <!-- Stats Card -->
+            {{!-- Seller Statistics Card --}}
             <div class="card mb-4">
                 <div class="card-body">
                     <div class="row">
@@ -64,12 +68,13 @@
                 </div>
             </div>
             
-            <!-- Products List -->
+            {{!-- Seller Products List Card --}}
             <div class="card">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Your Products</h5>
                 </div>
                 <div class="card-body p-0">
+                    {{!-- Agar products hain to table dikhayein --}}
                     {{#if products.length}}
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
@@ -83,9 +88,11 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {{!-- Seller products list loop --}}
                                 {{#each products}}
                                 <tr>
                                     <td>
+                                        {{!-- Product image aur name display --}}
                                         <div class="d-flex align-items-center">
                                             <img src="{{this.imageUrl}}" alt="{{this.name}}" class="img-thumbnail me-2" style="width: 50px; height: 50px; object-fit: cover;">
                                             <div>
@@ -96,21 +103,25 @@
                                     <td>Rs. {{this.price}}</td>
                                     <td>{{this.category}}</td>
                                     <td>
+                                        {{!-- Stock status badge --}}
                                         <span class="badge {{#if this.inStock}}bg-success{{else}}bg-danger{{/if}}">
                                             {{#if this.inStock}}In Stock{{else}}Out of Stock{{/if}}
                                         </span>
                                     </td>
                                     <td class="text-end">
+                                        {{!-- Product action buttons --}}
                                         <div class="btn-group">
+                                            {{!-- Edit product button --}}
                                             <a href="/seller/products/edit/{{this._id}}" class="btn btn-sm btn-outline-secondary">
                                                 <i class="fas fa-edit"></i>
                                             </a>
+                                            {{!-- Delete product button --}}
                                             <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{this._id}}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
                                         
-                                        <!-- Delete Modal -->
+                                        {{!-- Delete Confirmation Modal --}}
                                         <div class="modal fade" id="deleteModal{{this._id}}" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
@@ -136,6 +147,7 @@
                             </tbody>
                         </table>
                     </div>
+                    {{!-- Empty state message --}}
                     {{else}}
                     <div class="text-center py-5">
                         <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
@@ -150,4 +162,4 @@
             </div>
         </div>
     </div>
-</div> 
+</div>

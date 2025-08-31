@@ -1,25 +1,28 @@
-const express = require('express');
-const router = express.Router();
-const User = require('../models/User');
-const Product = require('../models/Product');
-const { isAuthenticated } = require('../middleware/auth');
+// Wishlist routes - User wishlist functionality ke liye routes
+const express = require('express'); // Express framework
+const router = express.Router(); // Router create karo
+const User = require('../models/User'); // User model
+const Product = require('../models/Product'); // Product model
+const { isAuthenticated } = require('../middleware/auth'); // Authentication middleware
 
-// Apply authentication middleware to all wishlist routes
+// Saare wishlist routes par authentication middleware apply karo
 router.use(isAuthenticated);
 
-// Get Wishlist page
+// GET - Wishlist page dikhane ke liye route
 router.get('/', async (req, res) => {
     try {
-        // Find user and populate wishlist with product information
+        // User find karo aur wishlist products populate karo
         const user = await User.findById(req.session.user.id)
-            .populate('wishlist');
+            .populate('wishlist'); // Wishlist mein product details populate karo
 
+        // Wishlist page render karo
         res.render('wishlist/index', {
             title: 'My Wishlist',
-            wishlistItems: user.wishlist || []
+            wishlistItems: user.wishlist || [] // Wishlist items (empty array agar koi nahi)
         });
     } catch (err) {
-        console.error('Wishlist error:', err);
+        console.error('Wishlist error:', err); // Error log karo
+        // Error page render karo
         res.status(500).render('error', {
             title: 'Error',
             message: 'Server error, please try again later'
@@ -27,16 +30,16 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Add item to wishlist (AJAX)
+// POST - Wishlist mein item add karne ke liye route (AJAX)
 router.post('/add/:productId', async (req, res) => {
     try {
-        const productId = req.params.productId;
-        const userId = req.session.user.id;
+        const productId = req.params.productId; // URL se product ID nikalo
+        const userId = req.session.user.id; // Session se user ID nikalo
 
-        // Find user
+        // User find karo database se
         const user = await User.findById(userId);
         
-        // Check if product is already in wishlist
+        // Check karo ke product pehle se wishlist mein hai ya nahi
         if (user.wishlist.includes(productId)) {
             return res.json({
                 success: true,
@@ -45,21 +48,23 @@ router.post('/add/:productId', async (req, res) => {
             });
         }
         
-        // Add product to wishlist
+        // Product ko wishlist mein add karo
         user.wishlist.push(productId);
-        await user.save();
+        await user.save(); // Database mein save karo
         
-        // Update wishlist count in session
+        // Session mein wishlist count update karo
         req.session.wishlistCount = user.wishlist.length;
         
+        // Success response bhejo
         res.json({
             success: true,
             message: 'Product added to your wishlist',
-            wishlistCount: user.wishlist.length,
+            wishlistCount: user.wishlist.length, // Updated count
             inWishlist: true
         });
     } catch (err) {
-        console.error('Add to wishlist error:', err);
+        console.error('Add to wishlist error:', err); // Error log karo
+        // Error response bhejo
         res.status(500).json({
             success: false,
             message: 'Server error, please try again later'
@@ -67,29 +72,31 @@ router.post('/add/:productId', async (req, res) => {
     }
 });
 
-// Remove item from wishlist (AJAX)
+// DELETE - Wishlist se item remove karne ke liye route (AJAX)
 router.delete('/remove/:productId', async (req, res) => {
     try {
-        const productId = req.params.productId;
-        const userId = req.session.user.id;
+        const productId = req.params.productId; // URL se product ID nikalo
+        const userId = req.session.user.id; // Session se user ID nikalo
         
-        // Remove product from wishlist
+        // User ke wishlist se product remove karo
         await User.findByIdAndUpdate(userId, {
-            $pull: { wishlist: productId }
+            $pull: { wishlist: productId } // MongoDB pull operator use kar ke remove karo
         });
         
-        // Get updated wishlist count
+        // Updated wishlist count nikalo
         const user = await User.findById(userId);
-        req.session.wishlistCount = user.wishlist.length;
+        req.session.wishlistCount = user.wishlist.length; // Session update karo
         
+        // Success response bhejo
         res.json({
             success: true,
             message: 'Product removed from your wishlist',
-            wishlistCount: user.wishlist.length,
+            wishlistCount: user.wishlist.length, // Updated count
             inWishlist: false
         });
     } catch (err) {
-        console.error('Remove from wishlist error:', err);
+        console.error('Remove from wishlist error:', err); // Error log karo
+        // Error response bhejo
         res.status(500).json({
             success: false,
             message: 'Server error, please try again later'
@@ -97,22 +104,25 @@ router.delete('/remove/:productId', async (req, res) => {
     }
 });
 
-// Remove item from wishlist (Form submission)
+// POST - Wishlist se item remove karne ke liye route (Form submission)
 router.post('/remove/:productId', async (req, res) => {
     try {
-        const productId = req.params.productId;
-        const userId = req.session.user.id;
+        const productId = req.params.productId; // URL se product ID nikalo
+        const userId = req.session.user.id; // Session se user ID nikalo
         
-        // Remove product from wishlist
+        // User ke wishlist se product remove karo
         await User.findByIdAndUpdate(userId, {
-            $pull: { wishlist: productId }
+            $pull: { wishlist: productId } // MongoDB pull operator use kar ke remove karo
         });
         
+        // Success message ke saath wishlist page par redirect karo
         res.redirect('/wishlist?message=Item removed from wishlist');
     } catch (err) {
-        console.error('Remove from wishlist error:', err);
+        console.error('Remove from wishlist error:', err); // Error log karo
+        // Error message ke saath wishlist page par redirect karo
         res.redirect('/wishlist?error=Server error, please try again');
     }
 });
 
-module.exports = router; 
+// Router export karo
+module.exports = router;

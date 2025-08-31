@@ -1,11 +1,13 @@
+{{!-- Admin Orders Management Page - Orders ki management aur status updates --}}
 <div class="container my-5">
     <div class="row">
-        <!-- Sidebar -->
+        {{!-- Admin Navigation Sidebar --}}
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Admin Menu</h5>
                 </div>
+                {{!-- Admin menu links --}}
                 <div class="list-group list-group-flush">
                     <a href="/admin/dashboard" class="list-group-item list-group-item-action">
                         <i class="fas fa-tachometer-alt me-2"></i> Dashboard
@@ -32,12 +34,13 @@
             </div>
         </div>
         
-        <!-- Main Content -->
+        {{!-- Main Orders Management Content --}}
         <div class="col-md-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">Manage Orders</h2>
             </div>
             
+            {{!-- Success message display --}}
             {{#if successMessage}}
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{successMessage}}
@@ -45,6 +48,7 @@
             </div>
             {{/if}}
             
+            {{!-- Error message display --}}
             {{#if errorMessage}}
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{errorMessage}}
@@ -52,11 +56,13 @@
             </div>
             {{/if}}
             
+            {{!-- Orders List Card --}}
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Orders List</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Agar orders hain to table dikhayein --}}
                     {{#if orders.length}}
                     <div class="table-responsive">
                         <table class="table table-hover">
@@ -72,10 +78,12 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {{!-- Orders list loop --}}
                                 {{#each orders}}
                                 <tr>
                                     <td>{{this.orderNumber}}</td>
                                     <td>
+                                        {{!-- Customer name display --}}
                                         {{#if this.user}}
                                             {{this.user.name}}
                                         {{else}}
@@ -85,6 +93,7 @@
                                     <td>{{formatDate this.createdAt}}</td>
                                     <td>Rs. {{formatPrice this.total}}</td>
                                     <td>
+                                        {{!-- Payment method badges with status --}}
                                         {{#if (eq this.paymentMethod 'jazzcash')}}
                                             {{#if this.paymentDetails.paymentStatus}}
                                                 <span class="badge {{#if (eq this.paymentDetails.paymentStatus 'pending')}}bg-warning text-dark{{else if (eq this.paymentDetails.paymentStatus 'approved')}}bg-success{{else if (eq this.paymentDetails.paymentStatus 'rejected')}}bg-danger{{/if}}">
@@ -110,6 +119,7 @@
                                         {{/if}}
                                     </td>
                                     <td>
+                                        {{!-- Order status badge with color coding --}}
                                         <span class="badge {{#if (eq this.status 'pending')}}bg-warning text-dark{{else if (eq this.status 'processing')}}bg-info{{else if (eq this.status 'shipped')}}bg-primary{{else if (eq this.status 'delivered')}}bg-success{{else if (eq this.status 'cancelled')}}bg-danger{{/if}}">
                                             {{#if (eq this.status 'pending')}}
                                                 Pending
@@ -125,6 +135,7 @@
                                         </span>
                                     </td>
                                     <td>
+                                        {{!-- View order details button --}}
                                         <a href="/admin/orders/{{this._id}}" class="btn btn-sm btn-primary">
                                             <i class="fas fa-eye"></i> View
                                         </a>
@@ -134,6 +145,7 @@
                             </tbody>
                         </table>
                     </div>
+                    {{!-- Empty state message --}}
                     {{else}}
                     <div class="text-center py-5">
                         <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>

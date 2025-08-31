@@ -1,27 +1,33 @@
+{{!-- Order Confirmation Page - Successful order placement confirmation --}}
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
+            {{!-- Success confirmation card --}}
             <div class="card border-success">
                 <div class="card-header bg-success text-white">
                     <h3 class="mb-0"><i class="fas fa-check-circle me-2"></i>Order Confirmed!</h3>
                 </div>
                 <div class="card-body p-5 text-center">
+                    {{!-- Success message section --}}
                     <div class="mb-4">
                         <i class="fas fa-check-circle text-success fa-5x mb-3"></i>
                         <h2>Thank You for Your Order</h2>
                         <p class="lead">Your order has been received and is being processed.</p>
                     </div>
                     
+                    {{!-- Order ID display --}}
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Order ID:</strong>
                         <span>{{orderId}}</span>
                     </div>
                     
+                    {{!-- Order date display --}}
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Order Date:</strong>
                         <span>{{formatDate order.createdAt}}</span>
                     </div>
                     
+                    {{!-- Order total amount --}}
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Order Total:</strong>
                         <span>{{orderTotal}}</span>
@@ -29,8 +35,10 @@
                     
                     <hr class="my-4">
                     
+                    {{!-- Order tracking information --}}
                     <p>You can track your order in your account dashboard.</p>
                     
+                    {{!-- Navigation buttons --}}
                     <div class="d-flex justify-content-center mt-4">
                         <a href="/" class="btn btn-outline-primary me-3">
                             <i class="fas fa-home me-2"></i>Return to Home
@@ -45,17 +53,18 @@
     </div>
 </div>
 
+{{!-- JavaScript for date formatting --}}
 <script>
-    // Format current date
+    // Current date ko format karne ke liye
     document.addEventListener('DOMContentLoaded', function() {
         const now = new Date();
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         const formattedDate = now.toLocaleDateString('en-US', options);
         
-        // Find the date element and update its content
+        // Date element ko find kar ke content update karein
         const dateElement = document.querySelector('.d-flex:nth-child(2) span');
         if (dateElement) {
             dateElement.textContent = formattedDate;
         }
     });
-</script> 
+</script>

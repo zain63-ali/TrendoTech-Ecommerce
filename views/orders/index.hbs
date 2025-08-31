@@ -1,11 +1,13 @@
+{{!-- Orders Index Page - User orders listing with account menu --}}
 <div class="container my-5">
     <div class="row">
-        <!-- Sidebar -->
+        {{!-- Account Navigation Sidebar --}}
         <div class="col-md-3 mb-4">
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">Account Menu</h5>
                 </div>
+                {{!-- Account menu links --}}
                 <div class="list-group list-group-flush">
                     <a href="/users/profile" class="list-group-item list-group-item-action">
                         <i class="fas fa-user me-2"></i> My Profile
@@ -16,11 +18,13 @@
                     <a href="/wishlist" class="list-group-item list-group-item-action">
                         <i class="fas fa-heart me-2"></i> My Wishlist
                     </a>
+                    {{!-- Seller dashboard link (sirf sellers ke liye) --}}
                     {{#if (eq user.role 'seller')}}
                     <a href="/seller/dashboard" class="list-group-item list-group-item-action">
                         <i class="fas fa-store me-2"></i> Seller Dashboard
                     </a>
                     {{/if}}
+                    {{!-- Admin dashboard link (sirf admins ke liye) --}}
                     {{#if (eq user.role 'admin')}}
                     <a href="/admin/dashboard" class="list-group-item list-group-item-action">
                         <i class="fas fa-cog me-2"></i> Admin Dashboard
@@ -33,16 +37,19 @@
             </div>
         </div>
         
-        <!-- Main Content -->
+        {{!-- Main Orders Content Section --}}
         <div class="col-md-9">
             <div class="card">
+                {{!-- Orders card header --}}
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">My Orders</h5>
                 </div>
                 <div class="card-body">
+                    {{!-- Orders table agar orders hain --}}
                     {{#if orders.length}}
                     <div class="table-responsive">
                         <table class="table table-hover">
+                            {{!-- Table headers --}}
                             <thead>
                                 <tr>
                                     <th>Order #</th>
@@ -53,13 +60,19 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
+                            {{!-- Orders data loop --}}
                             <tbody>
                                 {{#each orders}}
                                 <tr>
+                                    {{!-- Order number --}}
                                     <td>{{this.orderNumber}}</td>
+                                    {{!-- Order date (formatted) --}}
                                     <td>{{formatDate this.createdAt}}</td>
+                                    {{!-- Items count --}}
                                     <td>{{this.items.length}} item(s)</td>
+                                    {{!-- Order total (formatted) --}}
                                     <td>{{formatPrice this.total}}</td>
+                                    {{!-- Order status with colored badges --}}
                                     <td>
                                         {{#if (eq this.status 'pending')}}
                                         <span class="badge bg-warning text-dark">Pending</span>
@@ -73,6 +86,7 @@
                                         <span class="badge bg-danger">Cancelled</span>
                                         {{/if}}
                                     </td>
+                                    {{!-- View order details button --}}
                                     <td>
                                         <a href="/my-orders/{{this._id}}" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye"></i> View
@@ -83,6 +97,7 @@
                             </tbody>
                         </table>
                     </div>
+                    {{!-- Empty orders message agar koi orders nahi hain --}}
                     {{else}}
                     <div class="text-center py-5">
                         <i class="fas fa-shopping-bag fa-4x mb-3 text-muted"></i>
@@ -97,14 +112,16 @@
     </div>
 </div>
 
+{{!-- JavaScript helper functions --}}
 <script>
-    // Helper function for formatting dates and prices
+    // Handlebars helper function - Date formatting ke liye
     Handlebars.registerHelper('formatDate', function(date) {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(date).toLocaleDateString('en-US', options);
     });
     
+    // Handlebars helper function - Price formatting ke liye
     Handlebars.registerHelper('formatPrice', function(price) {
         return parseFloat(price).toFixed(2);
     });
-</script> 
+</script>
