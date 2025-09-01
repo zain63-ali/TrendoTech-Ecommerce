@@ -10,13 +10,13 @@ const User = require('../models/User'); // User model
 // Home page route - Main landing page
 router.get('/', async (req, res) => {
     try {
-        // Homepage ke liye featured products nikalo (maximum 6)
-        const featuredProducts = await Product.find({ featured: true }).limit(6);
+        // Homepage ke liye featured products nikalo (maximum 6) - sirf approved products
+        const featuredProducts = await Product.find({ featured: true, status: 'approved' }).limit(6);
         
-        // Different categories se products nikalo homepage sections ke liye
-        const menClothing = await Product.find({ category: 'men-clothing' }).limit(4);
-        const womenClothing = await Product.find({ category: 'women-clothing' }).limit(4);
-        const electronics = await Product.find({ category: 'electronics' }).limit(4);
+        // Different categories se products nikalo homepage sections ke liye - sirf approved products
+        const menClothing = await Product.find({ category: 'men-clothing', status: 'approved' }).limit(4);
+        const womenClothing = await Product.find({ category: 'women-clothing', status: 'approved' }).limit(4);
+        const electronics = await Product.find({ category: 'electronics', status: 'approved' }).limit(4);
         
         // Home template render karo saare products ke saath
         res.render('home', {

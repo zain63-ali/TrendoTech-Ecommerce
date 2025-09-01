@@ -39,6 +39,11 @@ const productSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, // Seller ka reference
         ref: 'User' // User model se link hai
     },
+    status: {
+        type: String, // Product approval status
+        enum: ['pending', 'approved', 'rejected'], // Allowed status values
+        default: 'pending' // Default status pending hai
+    },
     createdAt: {
         type: Date, // Product create hone ka time
         default: Date.now // Current time automatically set ho jaye ga

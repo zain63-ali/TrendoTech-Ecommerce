@@ -100,6 +100,11 @@ router.post('/products', upload.single('productImage'), async (req, res) => {
     try {
         const { name, description, price, category } = req.body; // Form data nikalo
         
+        // Security check - prevent sellers from setting status field
+        if (req.body.status) {
+            return res.redirect('/seller/products/add?error=Unauthorized action');
+        }
+        
         // Required fields validation
         if (!name || !description || !price || !category) {
             return res.redirect('/seller/products/add?error=All fields are required');
@@ -115,7 +120,7 @@ router.post('/products', upload.single('productImage'), async (req, res) => {
             (category ? category + '/' : '') + 
             req.file.filename;
         
-        // Naya product create karo
+        // Naya product create karo - status automatically 'pending' set hoga (model default se)
         const newProduct = new Product({
             name,
             description,
@@ -124,12 +129,13 @@ router.post('/products', upload.single('productImage'), async (req, res) => {
             imageUrl,
             inStock: req.body.inStock === 'true', // Stock status
             seller: req.session.user.id // Current seller ID
+            // Note: status field ko deliberately exclude kiya hai - sirf admin approve kar sakta hai
         });
         
         await newProduct.save(); // Database mein save karo
         
         // Success message ke saath dashboard par redirect karo
-        res.redirect('/seller/dashboard?success=Product added successfully');
+        res.redirect('/seller/dashboard?success=Product submitted for approval successfully');
     } catch (err) {
         console.error('Add product error:', err); // Error log karo
         res.redirect('/seller/products/add?error=' + encodeURIComponent(err.message || 'Server error, please try again'));
@@ -173,6 +179,11 @@ router.post('/products/:id', upload.single('productImage'), async (req, res) => 
     try {
         const { name, description, price, category, inStock } = req.body; // Form data nikalo
         
+        // Security check - prevent sellers from setting status field
+        if (req.body.status) {
+            return res.redirect(`/seller/products/edit/${req.params.id}?error=Unauthorized action`);
+        }
+        
         // Required fields validation
         if (!name || !description || !price || !category) {
             return res.redirect(`/seller/products/edit/${req.params.id}?error=All fields are required`);
@@ -192,11 +203,12 @@ router.post('/products/:id', upload.single('productImage'), async (req, res) => 
             });
         }
         
-        // Product fields update karo
+        // Product fields update karo - status field ko exclude kiya hai security ke liye
         product.name = name;
         product.description = description;
         product.price = price;
         product.category = category;
+        // Note: status field ko deliberately exclude kiya hai - sirf admin modify kar sakta hai
         
         // Agar naya image upload hua hai to update karo
         if (req.file) {

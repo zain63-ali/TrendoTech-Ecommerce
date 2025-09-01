@@ -18,6 +18,9 @@
                     <a href="/admin/products" class="list-group-item list-group-item-action active">
                         <i class="fas fa-box me-2"></i> Manage Products
                     </a>
+                    <a href="/admin/products/pending" class="list-group-item list-group-item-action">
+                        <i class="fas fa-clock me-2"></i> Product Approval
+                    </a>
                     <a href="/admin/orders" class="list-group-item list-group-item-action">
                         <i class="fas fa-shopping-cart me-2"></i> Manage Orders
                     </a>
@@ -106,10 +109,15 @@
                                         {{/if}}
                                     </td>
                                     <td>
-                                        {{!-- Stock status badge --}}
-                                        <span class="badge {{#if this.inStock}}bg-success{{else}}bg-danger{{/if}}">
-                                            {{#if this.inStock}}In Stock{{else}}Out of Stock{{/if}}
-                                        </span>
+                                        {{!-- Product status and stock status badges --}}
+                                        <div class="d-flex flex-column gap-1">
+                                            <span class="badge {{#if (eq this.status 'approved')}}bg-success{{else if (eq this.status 'pending')}}bg-warning{{else}}bg-danger{{/if}}">
+                                                {{#if (eq this.status 'approved')}}Approved{{else if (eq this.status 'pending')}}Pending{{else}}Rejected{{/if}}
+                                            </span>
+                                            <span class="badge {{#if this.inStock}}bg-info{{else}}bg-secondary{{/if}}">
+                                                {{#if this.inStock}}In Stock{{else}}Out of Stock{{/if}}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td class="text-end">
                                         {{!-- Product action buttons --}}

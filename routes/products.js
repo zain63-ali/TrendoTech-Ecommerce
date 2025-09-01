@@ -66,7 +66,8 @@ router.get('/', async (req, res) => {
             pageTitle = 'Featured Products';
         }
         
-        // Database se products find karo (latest first)
+        // Database se products find karo (latest first) - sirf approved products
+        query.status = 'approved'; // Sirf approved products dikhao
         const products = await Product.find(query).sort({ createdAt: -1 });
         
         // User ka wishlist nikalo (agar login hai)
@@ -99,8 +100,8 @@ router.get('/', async (req, res) => {
 // GET - Single product ki details dikhane ke liye route
 router.get('/:id', async (req, res) => {
     try {
-        // Product find karo ID se aur seller details populate karo
-        const product = await Product.findById(req.params.id).populate('seller', 'name');
+        // Product find karo ID se aur seller details populate karo - sirf approved products
+        const product = await Product.findOne({ _id: req.params.id, status: 'approved' }).populate('seller', 'name');
         
         if (!product) {
             // Agar product nahi mila to 404 error
@@ -110,10 +111,11 @@ router.get('/:id', async (req, res) => {
             });
         }
         
-        // Same category ke related products find karo (current product exclude kar ke)
+        // Same category ke related products find karo (current product exclude kar ke) - sirf approved products
         const relatedProducts = await Product.find({
             category: product.category, // Same category
-            _id: { $ne: product._id } // Current product exclude karo
+            _id: { $ne: product._id }, // Current product exclude karo
+            status: 'approved' // Sirf approved products
         }).limit(4); // Maximum 4 products
         
         // Check karo ke product user ke wishlist mein hai ya nahi

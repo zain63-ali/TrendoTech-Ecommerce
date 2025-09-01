@@ -123,8 +123,8 @@ router.post('/add', async (req, res) => {
         const { productId, quantity = 1 } = req.body;
         console.log('Adding to cart:', productId, quantity);
         
-        // Database se product ki details lao
-        const product = await Product.findById(productId);
+        // Database se product ki details lao - sirf approved products
+        const product = await Product.findOne({ _id: productId, status: 'approved' });
         if (!product) {
             // Agar product nahi mila to error return karo
             return res.status(404).json({ success: false, message: 'Product not found' });

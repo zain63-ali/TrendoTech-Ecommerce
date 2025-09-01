@@ -18,6 +18,12 @@
                     <a href="/admin/products" class="list-group-item list-group-item-action">
                         <i class="fas fa-box me-2"></i> Manage Products
                     </a>
+                    <a href="/admin/products/pending" class="list-group-item list-group-item-action">
+                        <i class="fas fa-clock me-2"></i> Product Approval
+                        {{#if pendingProductCount}}
+                        <span class="badge bg-warning text-dark ms-2">{{pendingProductCount}}</span>
+                        {{/if}}
+                    </a>
                     <a href="/admin/orders" class="list-group-item list-group-item-action">
                         <i class="fas fa-shopping-cart me-2"></i> Manage Orders
                     </a>
@@ -62,6 +68,11 @@
                             <i class="fas fa-box fa-3x text-success mb-3"></i>
                             <h5 class="card-title">Total Products</h5>
                             <p class="card-text display-4">{{productCount}}</p>
+                            <div class="small text-muted mb-2">
+                                <span class="badge bg-warning me-1">{{pendingProductCount}} Pending</span>
+                                <span class="badge bg-success me-1">{{approvedProductCount}} Approved</span>
+                                <span class="badge bg-danger">{{rejectedProductCount}} Rejected</span>
+                            </div>
                             <a href="/admin/products" class="btn btn-sm btn-outline-success mt-2">Manage Products</a>
                         </div>
                     </div>
@@ -122,14 +133,22 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <a href="/admin/users/add" class="btn btn-outline-primary mb-2 w-100">
                                 <i class="fas fa-user-plus me-2"></i> Add New User
                             </a>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <a href="/admin/products/add" class="btn btn-outline-success mb-2 w-100">
                                 <i class="fas fa-plus-circle me-2"></i> Add New Product
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="/admin/products/pending" class="btn btn-outline-warning mb-2 w-100">
+                                <i class="fas fa-clock me-2"></i> Product Approval
+                                {{#if pendingProductCount}}
+                                <span class="badge bg-warning text-dark ms-1">{{pendingProductCount}}</span>
+                                {{/if}}
                             </a>
                         </div>
                     </div>

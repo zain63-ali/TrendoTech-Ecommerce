@@ -15,8 +15,8 @@ router.post('/add', isAuthenticated, async (req, res) => {
             return res.redirect(`/products/${productId}?error=Please provide a valid comment`);
         }
         
-        // Product exist karta hai ya nahi check karo
-        const product = await Product.findById(productId);
+        // Product exist karta hai ya nahi check karo - sirf approved products
+        const product = await Product.findOne({ _id: productId, status: 'approved' });
         if (!product) {
             return res.redirect('/products?error=Product not found');
         }

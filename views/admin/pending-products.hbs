@@ -1,0 +1,207 @@
+{{!-- Admin Pending Products Approval Page --}}
+<div class="container my-5">
+    <div class="row">
+        {{!-- Admin Navigation Sidebar --}}
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Admin Menu</h5>
+                </div>
+                {{!-- Admin menu links --}}
+                <div class="list-group list-group-flush">
+                    <a href="/admin/dashboard" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                    <a href="/admin/users" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users me-2"></i> Manage Users
+                    </a>
+                    <a href="/admin/products" class="list-group-item list-group-item-action">
+                        <i class="fas fa-box me-2"></i> Manage Products
+                    </a>
+                    <a href="/admin/products/pending" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-clock me-2"></i> Product Approval
+                    </a>
+                    <a href="/admin/orders" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shopping-cart me-2"></i> Manage Orders
+                    </a>
+                    <a href="/admin/blogs" class="list-group-item list-group-item-action">
+                        <i class="fas fa-blog me-2"></i> Manage Blogs
+                    </a>
+                    <a href="/admin/feedbacks" class="list-group-item list-group-item-action">
+                        <i class="fas fa-comments me-2"></i> Manage Feedbacks
+                    </a>
+                    <a href="/users/profile" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user me-2"></i> My Profile
+                    </a>
+                    <a href="/users/logout" class="list-group-item list-group-item-action text-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        {{!-- Main Product Approval Content --}}
+        <div class="col-md-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Product Approval</h2>
+                <div class="badge bg-warning fs-6">{{products.length}} Pending Products</div>
+            </div>
+            
+            {{!-- Success message display --}}
+            {{#if formSuccess}}
+            <div class="alert alert-success mb-4">
+                <i class="fas fa-check-circle me-2"></i>{{formSuccess}}
+            </div>
+            {{/if}}
+            
+            {{!-- Error message display --}}
+            {{#if formError}}
+            <div class="alert alert-danger mb-4">
+                <i class="fas fa-exclamation-triangle me-2"></i>{{formError}}
+            </div>
+            {{/if}}
+            
+            {{!-- Pending Products List --}}
+            {{#if products.length}}
+            <div class="row">
+                {{#each products}}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        {{!-- Product Image --}}
+                        <img src="{{this.imageUrl}}" class="card-img-top" alt="{{this.name}}" style="height: 200px; object-fit: cover;">
+                        
+                        <div class="card-body">
+                            {{!-- Product Details --}}
+                            <h5 class="card-title">{{this.name}}</h5>
+                            <p class="card-text text-muted small">{{this.description}}</p>
+                            
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <strong>Price:</strong><br>
+                                    <span class="text-success fs-5">Rs. {{this.price}}</span>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Category:</strong><br>
+                                    <span class="badge bg-secondary">{{categoryName this.category}}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <strong>Seller:</strong><br>
+                                    {{this.seller.name}}
+                                </div>
+                                <div class="col-6">
+                                    <strong>Stock:</strong><br>
+                                    <span class="badge {{#if this.inStock}}bg-success{{else}}bg-danger{{/if}}">
+                                        {{#if this.inStock}}In Stock{{else}}Out of Stock{{/if}}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Submitted:</strong><br>
+                                <small class="text-muted">{{formatDate this.createdAt}}</small>
+                            </div>
+                        </div>
+                        
+                        {{!-- Approval Actions --}}
+                        <div class="card-footer bg-light">
+                            <div class="d-flex gap-2">
+                                {{!-- Approve Button --}}
+                                <button type="button" class="btn btn-success flex-fill" data-bs-toggle="modal" data-bs-target="#approveModal{{this._id}}">
+                                    <i class="fas fa-check me-2"></i>Approve
+                                </button>
+                                
+                                {{!-- Reject Button --}}
+                                <button type="button" class="btn btn-danger flex-fill" data-bs-toggle="modal" data-bs-target="#rejectModal{{this._id}}">
+                                    <i class="fas fa-times me-2"></i>Reject
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {{!-- Approve Confirmation Modal --}}
+                        <div class="modal fade" id="approveModal{{this._id}}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-success">
+                                            <i class="fas fa-check-circle me-2"></i>Approve Product
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to approve <strong>{{this.name}}</strong>?</p>
+                                        <p class="text-muted">This product will become visible to customers on the website.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="/admin/products/approve/{{this._id}}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-check me-2"></i>Approve Product
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {{!-- Reject Confirmation Modal --}}
+                        <div class="modal fade" id="rejectModal{{this._id}}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-danger">
+                                            <i class="fas fa-times-circle me-2"></i>Reject Product
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to reject <strong>{{this.name}}</strong>?</p>
+                                        <p class="text-muted">This product will remain hidden from customers and the seller will need to resubmit.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form action="/admin/products/reject/{{this._id}}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="fas fa-times me-2"></i>Reject Product
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{else}}
+                {{!-- Empty state when no pending products --}}
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-check-circle text-success mb-3" style="font-size: 3rem;"></i>
+                            <h4>No Pending Products</h4>
+                            <p class="text-muted">All products have been reviewed. Great job!</p>
+                            <a href="/admin/products" class="btn btn-primary">
+                                <i class="fas fa-box me-2"></i>View All Products
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+            {{else}}
+            {{!-- Empty state when no pending products --}}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-check-circle text-success mb-3" style="font-size: 3rem;"></i>
+                    <h4>No Pending Products</h4>
+                    <p class="text-muted">All products have been reviewed. Great job!</p>
+                    <a href="/admin/products" class="btn btn-primary">
+                        <i class="fas fa-box me-2"></i>View All Products
+                    </a>
+                </div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</div>

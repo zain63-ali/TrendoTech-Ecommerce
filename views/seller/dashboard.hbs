@@ -103,10 +103,15 @@
                                     <td>Rs. {{this.price}}</td>
                                     <td>{{this.category}}</td>
                                     <td>
-                                        {{!-- Stock status badge --}}
-                                        <span class="badge {{#if this.inStock}}bg-success{{else}}bg-danger{{/if}}">
-                                            {{#if this.inStock}}In Stock{{else}}Out of Stock{{/if}}
-                                        </span>
+                                        {{!-- Product approval status and stock status badges --}}
+                                        <div class="d-flex flex-column gap-1">
+                                            <span class="badge {{#if (eq this.status 'approved')}}bg-success{{else if (eq this.status 'pending')}}bg-warning{{else}}bg-danger{{/if}}">
+                                                {{#if (eq this.status 'approved')}}Approved{{else if (eq this.status 'pending')}}Pending Approval{{else}}Rejected{{/if}}
+                                            </span>
+                                            <span class="badge {{#if this.inStock}}bg-info{{else}}bg-secondary{{/if}}">
+                                                {{#if this.inStock}}In Stock{{else}}Out of Stock{{/if}}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td class="text-end">
                                         {{!-- Product action buttons --}}

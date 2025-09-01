@@ -17,6 +17,9 @@ router.get('/dashboard', async (req, res) => {
         // Dashboard ke liye counts nikalo
         const userCount = await User.countDocuments(); // Total users
         const productCount = await Product.countDocuments(); // Total products
+        const pendingProductCount = await Product.countDocuments({ status: 'pending' }); // Pending products
+        const approvedProductCount = await Product.countDocuments({ status: 'approved' }); // Approved products
+        const rejectedProductCount = await Product.countDocuments({ status: 'rejected' }); // Rejected products
         const sellerCount = await User.countDocuments({ role: 'seller' }); // Total sellers
         const blogCount = await Blog.countDocuments(); // Total blogs
         const orderCount = await Order.countDocuments(); // Total orders
@@ -27,6 +30,9 @@ router.get('/dashboard', async (req, res) => {
             title: 'Admin Dashboard',
             userCount,
             productCount,
+            pendingProductCount,
+            approvedProductCount,
+            rejectedProductCount,
             sellerCount,
             blogCount,
             orderCount,
@@ -302,6 +308,75 @@ router.post('/products/featured/:id', async (req, res) => {
     }
 });
 
+// GET - Pending products approval page
+router.get('/products/pending', async (req, res) => {
+    try {
+        // Pending products nikalo with seller details
+        const pendingProducts = await Product.find({ status: 'pending' })
+            .populate('seller', 'name email')
+            .sort({ createdAt: -1 });
+        
+        res.render('admin/pending-products', {
+            title: 'Product Approval',
+            products: pendingProducts,
+            formSuccess: req.query.success || null,
+            formError: req.query.error || null
+        });
+    } catch (err) {
+        console.error('Pending products error:', err);
+        res.status(500).render('error', {
+            title: 'Error',
+            message: 'Server error, please try again later'
+        });
+    }
+});
+
+// POST - Approve product
+router.post('/products/approve/:id', async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        
+        if (!product) {
+            return res.redirect('/admin/products/pending?error=Product not found');
+        }
+        
+        if (product.status !== 'pending') {
+            return res.redirect('/admin/products/pending?error=Product is not in pending status');
+        }
+        
+        product.status = 'approved';
+        await product.save();
+        
+        res.redirect('/admin/products/pending?success=Product approved successfully');
+    } catch (err) {
+        console.error('Approve product error:', err);
+        res.redirect('/admin/products/pending?error=Server error, please try again');
+    }
+});
+
+// POST - Reject product
+router.post('/products/reject/:id', async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        
+        if (!product) {
+            return res.redirect('/admin/products/pending?error=Product not found');
+        }
+        
+        if (product.status !== 'pending') {
+            return res.redirect('/admin/products/pending?error=Product is not in pending status');
+        }
+        
+        product.status = 'rejected';
+        await product.save();
+        
+        res.redirect('/admin/products/pending?success=Product rejected successfully');
+    } catch (err) {
+        console.error('Reject product error:', err);
+        res.redirect('/admin/products/pending?error=Server error, please try again');
+    }
+});
+
 // GET Edit Product Page
 router.get('/products/edit/:id', async (req, res) => {
     try {
@@ -440,7 +515,8 @@ router.post('/products/add', async (req, res) => {
             description,
             price,
             category,
-            featured: false // by default
+            featured: false, // by default
+            status: 'approved' // Admin-created products are automatically approved
         });
 
         await newProduct.save();
